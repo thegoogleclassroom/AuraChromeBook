@@ -217,23 +217,11 @@ function signInAccount() {
     showAccountLoadingScreen();
 }
 
-let _loadingScreenRunning = false;
-
 function showAccountLoadingScreen() {
-    if (_loadingScreenRunning) {
-        console.log('Loading screen already running, skipping duplicate call');
-        return;
-    }
-    _loadingScreenRunning = true;
-
     const loadingScreen = document.getElementById('account-loading-screen');
     const emailEl = document.getElementById('loading-email');
     const progressEl = document.getElementById('loading-progress');
     const detailsEl = document.getElementById('loading-details');
-
-    // Hide lock screen if visible
-    const lockScreen = document.getElementById('lock-screen');
-    if (lockScreen) lockScreen.style.display = 'none';
 
     if (loadingScreen) loadingScreen.style.display = 'flex';
     if (emailEl && currentAccount) emailEl.innerText = currentAccount.email;
@@ -255,7 +243,6 @@ function showAccountLoadingScreen() {
             clearInterval(interval);
             setTimeout(() => {
                 if (loadingScreen) loadingScreen.style.display = 'none';
-                _loadingScreenRunning = false;
                 initializeDesktopWithAccount();
             }, 500);
             return;
@@ -269,19 +256,13 @@ function showAccountLoadingScreen() {
 }
 
 function initializeDesktopWithAccount() {
-    if (!currentAccount) {
-        console.log('Aura OS: No current account in initializeDesktopWithAccount');
-        return;
-    }
-
-    console.log('Aura OS: Initializing desktop for', currentAccount.email);
+    if (!currentAccount) return;
 
     // Load account-specific data
     const savedSetup = getAccountData('setup_complete');
 
     if (!savedSetup) {
         // First time for this account - show setup
-        console.log('Aura OS: First time setup for this account');
         const setupScreen = document.getElementById('setup-screen');
         if (setupScreen) {
             setupScreen.style.display = 'flex';
@@ -290,19 +271,17 @@ function initializeDesktopWithAccount() {
         }
     } else {
         // Returning account - initialize desktop directly
-        console.log('Aura OS: Returning account, initializing desktop');
         initializeDesktop();
 
         // Check if password is set for this account
         const accountPassword = getAccountData('password');
-        const lockScreen = document.getElementById('lock-screen');
-
         if (accountPassword) {
-            console.log('Aura OS: Password set, showing lock screen');
-            updateLockScreenForAccount();
-            if (lockScreen) lockScreen.style.display = 'flex';
+            const lockScreen = document.getElementById('lock-screen');
+            if (lockScreen) {
+                updateLockScreenForAccount();
+                lockScreen.style.display = 'flex';
+            }
         } else {
-            console.log('Aura OS: No password, showing desktop');
             showUpdateModal();
             triggerInitialNotifications();
         }
@@ -356,7 +335,6 @@ function updateLockScreenAccountsList() {
 function switchToAccount(email) {
     const account = getAccountByEmail(email);
     if (!account) return;
-    if (currentAccount && currentAccount.email === email) return; // Already on this account
 
     // Save current session data if any
     if (currentAccount) {
@@ -452,12 +430,7 @@ window.unlockOS = function() {
         if (lockScreen) lockScreen.style.display = 'none';
         document.getElementById('lock-password').value = '';
         if (lockError) lockError.style.display = 'none';
-
-        // Only show update modal once per session
-        if (!sessionStorage.getItem('aura_update_shown')) {
-            showUpdateModal();
-            sessionStorage.setItem('aura_update_shown', 'true');
-        }
+        showUpdateModal();
         triggerInitialNotifications();
     } else {
         if (lockError) lockError.style.display = 'block';
@@ -655,45 +628,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ===== BOOT SEQUENCE WITH ACCOUNT SYSTEM =====
 window.onload = function() {
-    // Prevent duplicate boot execution (e.g., if about:blank iframe reloads)
-    if (window._auraBootComplete) return;
-    window._auraBootComplete = true;
-
-    // Theme setup
-    if (localStorage.getItem('os_theme') === 'light') {
-        document.body.setAttribute('data-theme', 'light');
-        const themeText = document.getElementById('theme-text');
-        if (themeText) themeText.innerText = "Light Theme";
-    }
-
     initAccountDB();
 
-    // Restore current account
+    // Check if there's a current account
     const savedAccountEmail = localStorage.getItem('aura_current_account');
     if (savedAccountEmail) {
         currentAccount = getAccountByEmail(savedAccountEmail);
     }
 
-    // Boot screen fade out, then route to correct screen
+    if(localStorage.getItem('os_theme') === 'light') {
+        document.body.setAttribute('data-theme', 'light');
+        const themeText = document.getElementById('theme-text');
+        if (themeText) themeText.innerText = "Light Theme";
+    }
+
     setTimeout(() => {
         const boot = document.getElementById('boot-screen');
-        if (boot) {
+        if(boot) {
             boot.style.opacity = '0';
             setTimeout(() => boot.style.display = 'none', 500);
         }
 
+        // Check if user has an account
         const accounts = getAllAccounts();
         const hasAccounts = Object.keys(accounts).length > 0;
 
         if (!hasAccounts && !currentAccount) {
+            // First time ever - show account creation (no skipping)
             showAccountModal();
         } else if (currentAccount) {
+            // Has current account - show loading screen
             showAccountLoadingScreen();
         } else {
+            // Has accounts but none selected - show sign in
             showAccountModal();
         }
     }, 2500);
-};;
+};
 
 // ===== ORIGINAL FUNCTIONS (preserved) =====
 
@@ -906,13 +877,14 @@ function initTabCloak() {
 
 // --- INSTANT ABOUT:BLANK CLOAKING - EXECUTE IMMEDIATELY ---
 (function checkInstantAboutBlank() {
-    // Don't run if we're already in an iframe (about:blank mode)
-    if (window.self !== window.top) {
-        return;
-    }
-
     const setting = localStorage.getItem('aboutblank_setting');
     if (setting === 'always') {
+        // Prevent multiple about:blank tabs - check if we're already in an iframe
+        if (window.self !== window.top) {
+            // Already inside an iframe (about:blank), do nothing
+            return;
+        }
+
         // Check if we've already opened about:blank in this session
         if (sessionStorage.getItem('aboutblank_opened')) {
             return;
@@ -940,8 +912,8 @@ function initTabCloak() {
             `);
             newWindow.document.close();
 
-            // Close the original tab - but don't block if it fails
-            try { window.close(); } catch(e) {}
+            // Close the original tab
+            window.close();
         }
     }
 })();
@@ -2326,7 +2298,41 @@ document.addEventListener('click', (e) => {
 });
 
 
-;
+// --- Boot Sequence & OOBE Setup ---
+window.onload = function() {
+    if(localStorage.getItem('os_theme') === 'light') {
+        document.body.setAttribute('data-theme', 'light');
+        const themeText = document.getElementById('theme-text');
+        if (themeText) themeText.innerText = "Light Theme";
+    }
+
+    setTimeout(() => {
+        const boot = document.getElementById('boot-screen');
+        if(boot) {
+            boot.style.opacity = '0';
+            setTimeout(() => boot.style.display = 'none', 500);
+        }
+
+        const isSetupComplete = localStorage.getItem('os_setup_complete');
+
+        if (!isSetupComplete) {
+            const setupScreen = document.getElementById('setup-screen');
+            if (setupScreen) setupScreen.style.display = 'flex';
+        } else {
+            initializeDesktop();
+            if (localStorage.getItem('os_password')) {
+                const lockUsername = document.getElementById('lock-username');
+                if (lockUsername) lockUsername.innerText = localStorage.getItem('os_username') || 'User';
+                const lockScreen = document.getElementById('lock-screen');
+                if (lockScreen) lockScreen.style.display = 'flex';
+            } else {
+                // No password set - show update modal immediately and trigger notifications
+                showUpdateModal();
+                triggerInitialNotifications();
+            }
+        }
+    }, 2500);
+};
 
 let tempUsername = '';
 let tempPassword = '';
