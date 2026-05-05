@@ -2645,6 +2645,9 @@ function lockSystem() {
     if (contextMenu) contextMenu.style.display = 'none';
 }
 
+// NOTE: unlockOS is already defined above by the account system override.
+// This original implementation is kept as reference but disabled to prevent overriding the account-aware version.
+/* ORIGINAL unlockOS (disabled - handled by account system):
 function unlockOS() {
     const input = document.getElementById('lock-password').value;
     const lockError = document.getElementById('lock-error');
@@ -2661,6 +2664,7 @@ function unlockOS() {
         if (lockError) lockError.style.display = 'block';
     }
 }
+*/
 
 function showSecurityQuestion() {
     const hintDiv = document.getElementById('security-hint');
