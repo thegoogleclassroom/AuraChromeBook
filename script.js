@@ -649,19 +649,32 @@ window.onload = function() {
             setTimeout(() => boot.style.display = 'none', 500);
         }
 
-        // Check if user has an account
+        // Check if user has an account system account
         const accounts = getAllAccounts();
         const hasAccounts = Object.keys(accounts).length > 0;
+        const isSetupComplete = localStorage.getItem('os_setup_complete');
 
-        if (!hasAccounts && !currentAccount) {
-            // First time ever - show account creation (no skipping)
-            showAccountModal();
-        } else if (currentAccount) {
-            // Has current account - show loading screen
+        if (currentAccount) {
+            // Signed into an account - show account loading screen
             showAccountLoadingScreen();
-        } else {
-            // Has accounts but none selected - show sign in
+        } else if (hasAccounts) {
+            // Has accounts but not signed in - show sign in modal
             showAccountModal();
+        } else if (!isSetupComplete) {
+            // Legacy: no accounts, no setup - first time ever
+            showAccountModal();
+        } else {
+            // Legacy: no accounts, but setup was completed before account system existed
+            initializeDesktop();
+            if (localStorage.getItem('os_password')) {
+                const lockUsername = document.getElementById('lock-username');
+                if (lockUsername) lockUsername.innerText = localStorage.getItem('os_username') || 'User';
+                const lockScreen = document.getElementById('lock-screen');
+                if (lockScreen) lockScreen.style.display = 'flex';
+            } else {
+                showUpdateModal();
+                triggerInitialNotifications();
+            }
         }
     }, 2500);
 };
@@ -2299,40 +2312,6 @@ document.addEventListener('click', (e) => {
 
 
 // --- Boot Sequence & OOBE Setup ---
-window.onload = function() {
-    if(localStorage.getItem('os_theme') === 'light') {
-        document.body.setAttribute('data-theme', 'light');
-        const themeText = document.getElementById('theme-text');
-        if (themeText) themeText.innerText = "Light Theme";
-    }
-
-    setTimeout(() => {
-        const boot = document.getElementById('boot-screen');
-        if(boot) {
-            boot.style.opacity = '0';
-            setTimeout(() => boot.style.display = 'none', 500);
-        }
-
-        const isSetupComplete = localStorage.getItem('os_setup_complete');
-
-        if (!isSetupComplete) {
-            const setupScreen = document.getElementById('setup-screen');
-            if (setupScreen) setupScreen.style.display = 'flex';
-        } else {
-            initializeDesktop();
-            if (localStorage.getItem('os_password')) {
-                const lockUsername = document.getElementById('lock-username');
-                if (lockUsername) lockUsername.innerText = localStorage.getItem('os_username') || 'User';
-                const lockScreen = document.getElementById('lock-screen');
-                if (lockScreen) lockScreen.style.display = 'flex';
-            } else {
-                // No password set - show update modal immediately and trigger notifications
-                showUpdateModal();
-                triggerInitialNotifications();
-            }
-        }
-    }, 2500);
-};
 
 let tempUsername = '';
 let tempPassword = '';
@@ -2645,9 +2624,6 @@ function lockSystem() {
     if (contextMenu) contextMenu.style.display = 'none';
 }
 
-// NOTE: unlockOS is already defined above by the account system override.
-// This original implementation is kept as reference but disabled to prevent overriding the account-aware version.
-/* ORIGINAL unlockOS (disabled - handled by account system):
 function unlockOS() {
     const input = document.getElementById('lock-password').value;
     const lockError = document.getElementById('lock-error');
@@ -2664,7 +2640,6 @@ function unlockOS() {
         if (lockError) lockError.style.display = 'block';
     }
 }
-*/
 
 function showSecurityQuestion() {
     const hintDiv = document.getElementById('security-hint');
