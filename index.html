@@ -12,6 +12,22 @@
 <base target="_blank">
 </head>
 <body data-theme="dark">
+    <!-- Server Warning Banner -->
+    <div id="server-warning-banner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 36px; background: linear-gradient(90deg, #d93025, #ea4335); z-index: 100000; display: flex; align-items: center; overflow: hidden; transition: opacity 1s ease, transform 0.5s ease;">
+        <div style="display: flex; white-space: nowrap; animation: bannerScroll 20s linear infinite;">
+            <span style="color: white; font-size: 13px; font-weight: 500; padding: 0 50px;">🚨 The website servers were in some issues, and now is fixed 🚨</span>
+            <span style="color: white; font-size: 13px; font-weight: 500; padding: 0 50px;">🚨 The website servers were in some issues, and now is fixed 🚨</span>
+            <span style="color: white; font-size: 13px; font-weight: 500; padding: 0 50px;">🚨 The website servers were in some issues, and now is fixed 🚨</span>
+            <span style="color: white; font-size: 13px; font-weight: 500; padding: 0 50px;">🚨 The website servers were in some issues, and now is fixed 🚨</span>
+        </div>
+    </div>
+    <style>
+    @keyframes bannerScroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+    </style>
+
     <div id="boot-screen">
         <div class="boot-logo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 64px; height: 64px; color: #8ab4f8;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>
@@ -50,28 +66,21 @@
     <!-- Update V1.8 Modal -->
     <div id="update-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100000; justify-content: center; align-items: center;">
         <div class="update-box" style="background: var(--sys-surface); border-radius: var(--radius-lg); padding: 30px; width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--sys-border);">
-            <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Update V1.9 is Here! <span style="font-size:14px;color:var(--sys-text-muted)">APR 30</span></h2>
+            <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Update V2.0 is Here! <span style="font-size:14px;color:var(--sys-text-muted)">MAY 5</span></h2>
             <div style="background: rgba(128,128,128,0.1); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;">
                 <h3 style="margin: 0 0 15px 0; color: var(--sys-text); font-size: 16px;">What's New:</h3>
                 <ul style="margin: 0; padding-left: 20px; color: var(--sys-text); font-size: 14px; line-height: 1.6;">
-                    <li><strong>👤 Account System</strong> - Create and manage Aura OS accounts with @auraos.com</li>
-                    <li><strong>🏠 Fixed Granny 3</strong> - Granny 3 now loads correctly</li>
-                    <li><strong>👵 Added Granny 2</strong> - New horror game available</li>
-                    <li><strong>⚡ Added Pokemon</strong> - Pokemon game now available</li>
-                    <li><strong>🏎️ Fixed Smash Karts</strong> - Smash Karts now loads correctly</li>
-                    <li><strong>🎵 Aura Music Media Controller</strong> - Control music from taskbar</li>
-                    <li><strong>🎤 Fixed Friday Night Funkin</strong> - FNF now loads correctly</li>
-                    <li><strong>🔫 Added 1v1.LOL</strong> - New battle royale shooter available</li>
-                    <li><strong>🔗 Auto Link Creator Removed</strong> - Now a button you can click instead</li>
-                    <li><strong>📌 Continue Where You Left Off</strong> - Active apps shown in launcher</li>
-                    <li><strong>🔋 Battery Saver</strong> - Saves data usage to a file automatically</li>
+                    <li><strong>🛍️ Upgraded The Play Store</strong> - New Games & Apps categories with sliding panels, app detail screens with playtime stats</li>
+                    <li><strong>🖥️ Fixed the Servers</strong> - Server issues resolved</li>
+                    <li><strong>📱 Added Bitlife</strong> - Life simulation game now available</li>
+                    <li><strong>🏈 Added Football Bros</strong> - Football game now available</li>
                 </ul>
             </div>
             <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
                 <button id="update-continue-btn" onclick="closeUpdateModal()" class="update-countdown-btn" disabled>Continue (5)</button>
             </div>
         </div>
-    </div>
+    </div></div>
 
     <!-- Account System Modal -->
     <div id="account-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a73e8 0%, #4285f4 50%, #8ab4f8 100%); z-index: 99996; justify-content: center; align-items: center;">
@@ -420,8 +429,12 @@
 
                 <h3 class="settings-title">System Updates</h3>
                 <div class="settings-card">
-                    <strong style="display: block; margin-bottom: 5px;">Version 1.9 APR 30 (Latest)</strong>
+                    <strong style="display: block; margin-bottom: 5px;">Version 2.0 MAY 5 (Latest)</strong>
                     <ul style="font-size: 13px; color: var(--sys-text-muted); margin-top: 0; margin-bottom: 15px; padding-left: 20px;">
+                        <li>🛍️ Upgraded The Play Store - Games & Apps categories with sliding panels and detail screens</li>
+                        <li>🖥️ Fixed the Servers - Server issues resolved</li>
+                        <li>📱 Added Bitlife - Life simulation game</li>
+                        <li>🏈 Added Football Bros - Football sports game</li>
                         <li>👤 Account System - Create and manage Aura OS accounts</li>
                         <li>🏠 Fixed Granny 3 - now loads correctly</li>
                         <li>👵 Added Granny 2 - new horror game</li>
@@ -430,10 +443,8 @@
                         <li>🎵 Aura Music Media Controller - control from taskbar</li>
                         <li>🎤 Fixed Friday Night Funkin - now loads correctly</li>
                         <li>🔫 Added 1v1.LOL - new battle royale shooter</li>
-                        <li>Auto Link Creator removed - now accessible via button</li>
                         <li>Continue where you left off - active apps in launcher</li>
                         <li>Battery Saver - saves data usage to file automatically</li>
-                        <li>Added Doodle Jump, Driving Simulator, Effing Zombies</li>
                     </ul>
                     <button onclick="alert('Your system is up to date!')" class="modern-btn">Check for Updates</button>
                 </div>
@@ -449,10 +460,10 @@
         <div class="window" id="store-window" style="display: none; width: 900px; height: 650px;">
             <div class="window-header" id="store-window-header"><span class="window-title">🛍️ Play Store</span><div><button class="win-btn" onclick="minimizeApp('store-window')">−</button><button class="win-btn" onclick="maximizeApp('store-window')">□</button><button class="win-btn close-btn" onclick="closeApp('store-window')">✕</button></div></div>
             <div class="window-content store-bg" style="padding: 0; display: flex; flex-direction: column;">
-                <div id="new-play-store" style="display: flex; height: 100%; background: #1a1a2e; color: #e8eaed; font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif;">
+                <div id="new-play-store" style="display: flex; height: 100%; background: #1a1a2e; color: #e8eaed; font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif; overflow: hidden;">
 
                     <!-- Left Sidebar -->
-                    <div id="ps-sidebar" style="width: 200px; background: #16213e; display: flex; flex-direction: column; padding: 15px 0; border-right: 1px solid rgba(255,255,255,0.05);">
+                    <div id="ps-sidebar" style="width: 200px; background: #16213e; display: flex; flex-direction: column; padding: 15px 0; border-right: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;">
                         <div style="padding: 0 15px 20px; display: flex; align-items: center; gap: 10px;">
                             <div id="ps-user-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #1a73e8, #8ab4f8); display: flex; align-items: center; justify-content: center; font-size: 16px;">👤</div>
                             <div style="font-size: 13px; font-weight: 500; color: #e8eaed; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="ps-username">User</div>
@@ -460,11 +471,18 @@
                         <div style="padding: 0 15px 15px;">
                             <button onclick="showPlayStoreTab('favorites')" id="ps-fav-btn" style="background: transparent; border: none; color: #ffd700; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 8px; transition: 0.2s;">⭐</button>
                         </div>
+
+                        <!-- Category Tabs -->
+                        <div style="padding: 0 10px 10px; display: flex; gap: 5px;">
+                            <button id="ps-cat-games" class="ps-cat-btn active" onclick="switchPlayStoreCategory('games')">🎮 Games</button>
+                            <button id="ps-cat-apps" class="ps-cat-btn" onclick="switchPlayStoreCategory('apps')">📱 Apps</button>
+                        </div>
+
                         <div id="ps-game-list" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;"></div>
                     </div>
 
-                    <!-- Main Content -->
-                    <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                    <!-- Main Content Area -->
+                    <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative;">
 
                         <div id="ps-nav" style="display: flex; gap: 5px; padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <button class="ps-nav-btn active" onclick="showPlayStoreTab('home')" data-tab="home">Home</button>
@@ -473,133 +491,93 @@
                             <button class="ps-nav-btn" onclick="showPlayStoreTab('settings')" data-tab="settings">Settings</button>
                         </div>
 
-                        <div id="ps-content" style="flex: 1; overflow-y: auto; padding: 20px;">
+                        <!-- Sliding Content Container -->
+                        <div id="ps-sliding-container" style="flex: 1; position: relative; overflow: hidden;">
 
-                            <!-- HOME TAB -->
-                            <div id="ps-tab-home" class="ps-tab active">
-                                <div id="ps-home-empty" style="display: none; text-align: center; padding: 60px 20px; color: #9aa0a6;">
-                                    <div style="font-size: 48px; margin-bottom: 15px;">🎮</div>
-                                    <h3 style="margin: 0 0 10px; font-weight: 500;">No Recent Games</h3>
-                                    <p style="margin: 0; font-size: 13px;">Install games from the Store tab to start playing!</p>
-                                </div>
-                                <div id="ps-home-content">
-                                    <div id="ps-featured-game" style="margin-bottom: 30px;"></div>
-                                    <div id="ps-recent-section" style="display: none;">
-                                        <h3 style="margin: 0 0 15px; font-size: 16px; font-weight: 500; color: #e8eaed;">Recent Play</h3>
-                                        <div id="ps-recent-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px;"></div>
+                            <!-- Games Panel -->
+                            <div id="ps-games-panel" class="ps-slide-panel active">
+                                <div id="ps-content" style="height: 100%; overflow-y: auto; padding: 20px;">
+
+                                    <!-- HOME TAB -->
+                                    <div id="ps-tab-home" class="ps-tab active">
+                                        <div id="ps-home-empty" style="display: none; text-align: center; padding: 60px 20px; color: #9aa0a6;">
+                                            <div style="font-size: 48px; margin-bottom: 15px;">🎮</div>
+                                            <h3 style="margin: 0 0 10px; font-weight: 500;">No Recent Games</h3>
+                                            <p style="margin: 0; font-size: 13px;">Install games from the Store tab to start playing!</p>
+                                        </div>
+                                        <div id="ps-home-content">
+                                            <div id="ps-featured-game" style="margin-bottom: 30px;"></div>
+                                            <div id="ps-recent-section" style="display: none;">
+                                                <h3 style="margin: 0 0 15px; font-size: 16px; font-weight: 500; color: #e8eaed;">Recent Play</h3>
+                                                <div id="ps-recent-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px;"></div>
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    <!-- LIBRARY TAB -->
+                                    <div id="ps-tab-library" class="ps-tab" style="display: none;">
+                                        <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 500;">My Library</h3>
+                                        <div id="ps-library-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px;"></div>
+                                        <div id="ps-library-empty" style="display: none; text-align: center; padding: 60px 20px; color: #9aa0a6;">
+                                            <div style="font-size: 48px; margin-bottom: 15px;">📚</div>
+                                            <h3 style="margin: 0 0 10px; font-weight: 500;">Library Empty</h3>
+                                            <p style="margin: 0; font-size: 13px;">Install apps and games from the Store to see them here.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- STORE TAB -->
+                                    <div id="ps-tab-store" class="ps-tab" style="display: none;">
+                                        <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 500;">Browse Store</h3>
+                                        <div style="margin-bottom: 20px;">
+                                            <input type="text" id="ps-store-search" placeholder="Search games..." onkeyup="filterPlayStoreGames()" style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #e8eaed; font-size: 14px; outline: none; box-sizing: border-box;">
+                                        </div>
+                                        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                                            <span class="ps-category active" onclick="filterStoreCategory('all')">All</span>
+                                            <span class="ps-category" onclick="filterStoreCategory('action')">Action</span>
+                                            <span class="ps-category" onclick="filterStoreCategory('arcade')">Arcade</span>
+                                            <span class="ps-category" onclick="filterStoreCategory('racing')">Racing</span>
+                                            <span class="ps-category" onclick="filterStoreCategory('sports')">Sports</span>
+                                            <span class="ps-category" onclick="filterStoreCategory('horror')">Horror</span>
+                                            <span class="ps-category" onclick="filterStoreCategory('rpg')">RPG</span>
+                                            <span class="ps-category" onclick="filterStoreCategory('simulation')">Simulation</span>
+                                        </div>
+                                        <div id="ps-store-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px;"></div>
+                                    </div>
+
+                                    <!-- SETTINGS TAB -->
+                                    <div id="ps-tab-settings" class="ps-tab" style="display: none;">
+                                        <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 500;">Play Store Settings</h3>
+                                        <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+                                            <h4 style="margin: 0 0 10px; font-size: 14px; color: #9aa0a6;">Data Usage</h4>
+                                            <p style="margin: 0; font-size: 13px;">Apps are installed locally in your browser storage.</p>
+                                        </div>
+                                        <button onclick="clearPlayStoreData()" style="background: rgba(234, 67, 53, 0.2); color: #ea4335; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-weight: 500; transition: 0.2s;">🗑️ Clear All Play Store Data</button>
+                                    </div>
+
                                 </div>
                             </div>
 
-                            <!-- LIBRARY TAB -->
-                            <div id="ps-tab-library" class="ps-tab" style="display: none;">
-                                <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 500;">My Library</h3>
-                                <div id="ps-library-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px;"></div>
-                                <div id="ps-library-empty" style="display: none; text-align: center; padding: 60px 20px; color: #9aa0a6;">
-                                    <div style="font-size: 48px; margin-bottom: 15px;">📚</div>
-                                    <h3 style="margin: 0 0 10px; font-weight: 500;">Library Empty</h3>
-                                    <p style="margin: 0; font-size: 13px;">Install apps and games from the Store to see them here.</p>
+                            <!-- Apps Panel -->
+                            <div id="ps-apps-panel" class="ps-slide-panel" style="transform: translateX(100%);">
+                                <div style="height: 100%; overflow-y: auto; padding: 20px;">
+                                    <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 500;">Apps</h3>
+                                    <div id="ps-apps-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px;"></div>
                                 </div>
                             </div>
 
-                            <!-- STORE TAB -->
-                            <div id="ps-tab-store" class="ps-tab" style="display: none;">
-                                <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 500;">Browse Store</h3>
-                                <div style="margin-bottom: 20px;">
-                                    <input type="text" id="ps-store-search" placeholder="Search games..." onkeyup="filterPlayStoreGames()" style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #e8eaed; font-size: 14px; outline: none; box-sizing: border-box;">
+                            <!-- App/Game Detail Overlay -->
+                            <div id="ps-detail-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #1a1a2e; z-index: 10; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); overflow-y: auto;">
+                                <div style="padding: 20px;">
+                                    <button onclick="closePlayStoreDetail()" style="background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 6px;">← Back</button>
+                                    <div id="ps-detail-content"></div>
                                 </div>
-                                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-                                    <span class="ps-category active" onclick="filterStoreCategory('all')">All</span>
-                                    <span class="ps-category" onclick="filterStoreCategory('action')">Action</span>
-                                    <span class="ps-category" onclick="filterStoreCategory('arcade')">Arcade</span>
-                                    <span class="ps-category" onclick="filterStoreCategory('racing')">Racing</span>
-                                    <span class="ps-category" onclick="filterStoreCategory('sports')">Sports</span>
-                                    <span class="ps-category" onclick="filterStoreCategory('horror')">Horror</span>
-                                    <span class="ps-category" onclick="filterStoreCategory('rpg')">RPG</span>
-                                    <span class="ps-category" onclick="filterStoreCategory('simulation')">Simulation</span>
-                                </div>
-                                <div id="ps-store-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px;"></div>
-                            </div>
-
-                            <!-- SETTINGS TAB -->
-                            <div id="ps-tab-settings" class="ps-tab" style="display: none;">
-                                <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 500;">Play Store Settings</h3>
-                                <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin-bottom: 15px;">
-                                    <h4 style="margin: 0 0 10px; font-size: 14px; color: #9aa0a6;">Data Usage</h4>
-                                    <p style="margin: 0; font-size: 13px;">Apps are installed locally in your browser storage.</p>
-                                </div>
-                                <button onclick="clearPlayStoreData()" style="background: rgba(234, 67, 53, 0.2); color: #ea4335; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-weight: 500; transition: 0.2s;">🗑️ Clear All Play Store Data</button>
                             </div>
 
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-<div class="window" id="infinitecraft-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="infinitecraft-window-header"><span class="window-title">⚗️ Infinite Craft</span><div><button class="win-btn" onclick="minimizeApp('infinitecraft-window')">−</button><button class="win-btn" onclick="maximizeApp('infinitecraft-window')">□</button><button class="win-btn close-btn" onclick="closeApp('infinitecraft-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/infinitecraft.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="paperio-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="paperio-window-header"><span class="window-title">📄 Paper.io</span><div><button class="win-btn" onclick="minimizeApp('paperio-window')">−</button><button class="win-btn" onclick="maximizeApp('paperio-window')">□</button><button class="win-btn close-btn" onclick="closeApp('paperio-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/paperio.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="parkingfury-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="parkingfury-window-header"><span class="window-title">🅿️ Parking Fury</span><div><button class="win-btn" onclick="minimizeApp('parkingfury-window')">−</button><button class="win-btn" onclick="maximizeApp('parkingfury-window')">□</button><button class="win-btn close-btn" onclick="closeApp('parkingfury-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/parkingfury.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="granny3-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="granny3-window-header"><span class="window-title">👵 Granny 3</span><div><button class="win-btn" onclick="minimizeApp('granny3-window')">−</button><button class="win-btn" onclick="maximizeApp('granny3-window')">□</button><button class="win-btn close-btn" onclick="closeApp('granny3-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/granny3.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="fridaynightfunk-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="fridaynightfunk-window-header"><span class="window-title">🎤 Friday Night Funkin</span><div><button class="win-btn" onclick="minimizeApp('fridaynightfunk-window')">−</button><button class="win-btn" onclick="maximizeApp('fridaynightfunk-window')">□</button><button class="win-btn close-btn" onclick="closeApp('fridaynightfunk-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/FridayNightFunk.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="geometrydash-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="geometrydash-window-header"><span class="window-title">📐 Geometry Dash</span><div><button class="win-btn" onclick="minimizeApp('geometrydash-window')">−</button><button class="win-btn" onclick="maximizeApp('geometrydash-window')">□</button><button class="win-btn close-btn" onclick="closeApp('geometrydash-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Geo-Dash.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="discord-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="discord-window-header"><span class="window-title">💬 Discord</span><div><button class="win-btn" onclick="minimizeApp('discord-window')">−</button><button class="win-btn" onclick="maximizeApp('discord-window')">□</button><button class="win-btn close-btn" onclick="closeApp('discord-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/Discord.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="auraflix-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="auraflix-window-header"><span class="window-title">🎬 AuraFlix</span><div><button class="win-btn" onclick="minimizeApp('auraflix-window')">−</button><button class="win-btn" onclick="maximizeApp('auraflix-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auraflix-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraFlix.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="auramusic-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="auramusic-window-header"><span class="window-title">🎵 Aura Music</span><div><button class="win-btn" onclick="minimizeApp('auramusic-window')">−</button><button class="win-btn" onclick="maximizeApp('auramusic-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auramusic-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraOS Music.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="smashcarts-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="smashcarts-window-header"><span class="window-title">🏎️ Smash Carts</span><div><button class="win-btn" onclick="minimizeApp('smashcarts-window')">−</button><button class="win-btn" onclick="maximizeApp('smashcarts-window')">□</button><button class="win-btn close-btn" onclick="closeApp('smashcarts-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/smash carts.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="eaglercraft-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="eaglercraft-window-header"><span class="window-title">⛏️ Eaglercraft</span><div><button class="win-btn" onclick="minimizeApp('eaglercraft-window')">−</button><button class="win-btn" onclick="maximizeApp('eaglercraft-window')">□</button><button class="win-btn close-btn" onclick="closeApp('eaglercraft-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Eaglercraft.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="fnae-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="fnae-window-header"><span class="window-title">🐻 Five Nights</span><div><button class="win-btn" onclick="minimizeApp('fnae-window')">−</button><button class="win-btn" onclick="maximizeApp('fnae-window')">□</button><button class="win-btn close-btn" onclick="closeApp('fnae-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Five Nights at Epstein's.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="granny-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="granny-window-header"><span class="window-title">👵 Granny</span><div><button class="win-btn" onclick="minimizeApp('granny-window')">−</button><button class="win-btn" onclick="maximizeApp('granny-window')">□</button><button class="win-btn close-btn" onclick="closeApp('granny-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Granny.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="escaperoad-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="escaperoad-window-header"><span class="window-title">🚗 Escape Road</span><div><button class="win-btn" onclick="minimizeApp('escaperoad-window')">−</button><button class="win-btn" onclick="maximizeApp('escaperoad-window')">□</button><button class="win-btn close-btn" onclick="closeApp('escaperoad-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Escape Road.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="escaperoad2-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="escaperoad2-window-header"><span class="window-title">🏎️ Escape Road 2</span><div><button class="win-btn" onclick="minimizeApp('escaperoad2-window')">−</button><button class="win-btn" onclick="maximizeApp('escaperoad2-window')">□</button><button class="win-btn close-btn" onclick="closeApp('escaperoad2-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Escape Road 2.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="solarsmash-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="solarsmash-window-header"><span class="window-title">🪐 Solar Smash</span><div><button class="win-btn" onclick="minimizeApp('solarsmash-window')">−</button><button class="win-btn" onclick="maximizeApp('solarsmash-window')">□</button><button class="win-btn close-btn" onclick="closeApp('solarsmash-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Solar Smash.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="brainrot-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="brainrot-window-header"><span class="window-title">🧠 Steal a Brainrot</span><div><button class="win-btn" onclick="minimizeApp('brainrot-window')">−</button><button class="win-btn" onclick="maximizeApp('brainrot-window')">□</button><button class="win-btn close-btn" onclick="closeApp('brainrot-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Steal a Brainrot.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="ragdollhit-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="ragdollhit-window-header"><span class="window-title">🥊 Ragdoll Hit</span><div><button class="win-btn" onclick="minimizeApp('ragdollhit-window')">−</button><button class="win-btn" onclick="maximizeApp('ragdollhit-window')">□</button><button class="win-btn close-btn" onclick="closeApp('ragdollhit-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Ragdoll Hit.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="ragdollarchers-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="ragdollarchers-window-header"><span class="window-title">🏹 Ragdoll Archers</span><div><button class="win-btn" onclick="minimizeApp('ragdollarchers-window')">−</button><button class="win-btn" onclick="maximizeApp('ragdollarchers-window')">□</button><button class="win-btn close-btn" onclick="closeApp('ragdollarchers-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Ragdoll Archers.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="99nights-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="99nights-window-header"><span class="window-title">🌲 99 Nights in the Forest</span><div><button class="win-btn" onclick="minimizeApp('99nights-window')">−</button><button class="win-btn" onclick="maximizeApp('99nights-window')">□</button><button class="win-btn close-btn" onclick="closeApp('99nights-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/99 Nights.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="rocketleague-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="rocketleague-window-header"><span class="window-title">⚽ Rocket League</span><div><button class="win-btn" onclick="minimizeApp('rocketleague-window')">−</button><button class="win-btn" onclick="maximizeApp('rocketleague-window')">□</button><button class="win-btn close-btn" onclick="closeApp('rocketleague-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Rocket League.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="bballrandom-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="bballrandom-window-header"><span class="window-title">🏀 Basketball Random</span><div><button class="win-btn" onclick="minimizeApp('bballrandom-window')">−</button><button class="win-btn" onclick="maximizeApp('bballrandom-window')">□</button><button class="win-btn close-btn" onclick="closeApp('bballrandom-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Basketball Random.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="bballbros-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="bballbros-window-header"><span class="window-title">🏀 Basketball Bros</span><div><button class="win-btn" onclick="minimizeApp('bballbros-window')">−</button><button class="win-btn" onclick="maximizeApp('bballbros-window')">□</button><button class="win-btn close-btn" onclick="closeApp('bballbros-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Basketball Bros.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="bballlegend-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="bballlegend-window-header"><span class="window-title">🏀 Basketball Legend</span><div><button class="win-btn" onclick="minimizeApp('bballlegend-window')">−</button><button class="win-btn" onclick="maximizeApp('bballlegend-window')">□</button><button class="win-btn close-btn" onclick="closeApp('bballlegend-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Basketball Legend.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="roblox-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="roblox-window-header"><span class="window-title">🟥 Roblox</span><div><button class="win-btn" onclick="minimizeApp('roblox-window')">−</button><button class="win-btn" onclick="maximizeApp('roblox-window')">□</button><button class="win-btn close-btn" onclick="closeApp('roblox-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Roblox.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="gtavice-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="gtavice-window-header"><span class="window-title">🚔 GTA III : Vice City</span><div><button class="win-btn" onclick="minimizeApp('gtavice-window')">−</button><button class="win-btn" onclick="maximizeApp('gtavice-window')">□</button><button class="win-btn close-btn" onclick="closeApp('gtavice-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/GTA-Vice.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="pixelfruits-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="pixelfruits-window-header"><span class="window-title">🍎 Pixel Fruits</span><div><button class="win-btn" onclick="minimizeApp('pixelfruits-window')">−</button><button class="win-btn" onclick="maximizeApp('pixelfruits-window')">□</button><button class="win-btn close-btn" onclick="closeApp('pixelfruits-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/PixelFruit.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="robloxanimator-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="robloxanimator-window-header"><span class="window-title">🎬 Roblox Animator V1.7</span><div><button class="win-btn" onclick="minimizeApp('robloxanimator-window')">−</button><button class="win-btn" onclick="maximizeApp('robloxanimator-window')">□</button><button class="win-btn close-btn" onclick="closeApp('robloxanimator-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/Roblox Animator.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="aceattorney-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="aceattorney-window-header"><span class="window-title">⚖️ Ace Attorney</span><div><button class="win-btn" onclick="minimizeApp('aceattorney-window')">−</button><button class="win-btn" onclick="maximizeApp('aceattorney-window')">□</button><button class="win-btn close-btn" onclick="closeApp('aceattorney-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/aceattorney.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="callofduty-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="callofduty-window-header"><span class="window-title">🔫 Call of Duty</span><div><button class="win-btn" onclick="minimizeApp('callofduty-window')">−</button><button class="win-btn" onclick="maximizeApp('callofduty-window')">□</button><button class="win-btn close-btn" onclick="closeApp('callofduty-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/callofdutymodern.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="stateio-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="stateio-window-header"><span class="window-title">🗺️ State.io</span><div><button class="win-btn" onclick="minimizeApp('stateio-window')">−</button><button class="win-btn" onclick="maximizeApp('stateio-window')">□</button><button class="win-btn close-btn" onclick="closeApp('stateio-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/stateio.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="undertaleyellow-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="undertaleyellow-window-header"><span class="window-title">💛 Undertale Yellow</span><div><button class="win-btn" onclick="minimizeApp('undertaleyellow-window')">−</button><button class="win-btn" onclick="maximizeApp('undertaleyellow-window')">□</button><button class="win-btn close-btn" onclick="closeApp('undertaleyellow-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/undertaleyellow.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="yanderesim-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="yanderesim-window-header"><span class="window-title">🔪 Yandere Simulator</span><div><button class="win-btn" onclick="minimizeApp('yanderesim-window')">−</button><button class="win-btn" onclick="maximizeApp('yanderesim-window')">□</button><button class="win-btn close-btn" onclick="closeApp('yanderesim-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/yanderesim.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="doodlejump-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="doodlejump-window-header"><span class="window-title">🐰 Doodle Jump</span><div><button class="win-btn" onclick="minimizeApp('doodlejump-window')">−</button><button class="win-btn" onclick="maximizeApp('doodlejump-window')">□</button><button class="win-btn close-btn" onclick="closeApp('doodlejump-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/DoodleJump.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="drivingsimulator-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="drivingsimulator-window-header"><span class="window-title">🚗 Driving Simulator</span><div><button class="win-btn" onclick="minimizeApp('drivingsimulator-window')">−</button><button class="win-btn" onclick="maximizeApp('drivingsimulator-window')">□</button><button class="win-btn close-btn" onclick="closeApp('drivingsimulator-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Driving Simulator.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="effingzombies-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="effingzombies-window-header"><span class="window-title">🧟 Effing Zombies</span><div><button class="win-btn" onclick="minimizeApp('effingzombies-window')">−</button><button class="win-btn" onclick="maximizeApp('effingzombies-window')">□</button><button class="win-btn close-btn" onclick="closeApp('effingzombies-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/effing zombies.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="granny2-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="granny2-window-header"><span class="window-title">👵 Granny 2</span><div><button class="win-btn" onclick="minimizeApp('granny2-window')">−</button><button class="win-btn" onclick="maximizeApp('granny2-window')">□</button><button class="win-btn close-btn" onclick="closeApp('granny2-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/granny2.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="pokemon-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="pokemon-window-header"><span class="window-title">⚡ Pokemon</span><div><button class="win-btn" onclick="minimizeApp('pokemon-window')">−</button><button class="win-btn" onclick="maximizeApp('pokemon-window')">□</button><button class="win-btn close-btn" onclick="closeApp('pokemon-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/pokemon-wip.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="1v1lol-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="1v1lol-window-header"><span class="window-title">🔫 1v1.LOL</span><div><button class="win-btn" onclick="minimizeApp('1v1lol-window')">−</button><button class="win-btn" onclick="maximizeApp('1v1lol-window')">□</button><button class="win-btn close-btn" onclick="closeApp('1v1lol-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/1v1 LOL.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="linkcreator-window" style="display: none; width: 600px; height: 500px;">
-            <div class="window-header" id="linkcreator-window-header">
-                <span class="window-title">🔗 Link Creator</span>
-                <div>
-                    <button class="win-btn" onclick="minimizeApp('linkcreator-window')">−</button>
-                    <button class="win-btn" onclick="maximizeApp('linkcreator-window')">□</button>
-                    <button class="win-btn close-btn" onclick="closeApp('linkcreator-window')">✕</button>
-                </div>
-            </div>
-            <div class="window-content" style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
-                <p style="margin: 0; color: var(--sys-text-muted); font-size: 13px;">Create custom shareable links for your favorite sites.</p>
-                <input type="text" id="lc-url" placeholder="Enter URL (e.g., https://example.com)" class="modern-input" style="margin-bottom: 0;">
-                <input type="text" id="lc-title" placeholder="Link Title (optional)" class="modern-input" style="margin-bottom: 0;">
-                <button onclick="generateLink()" class="modern-btn">✨ Generate Link</button>
-                <div id="lc-result" style="display: none; background: rgba(128,128,128,0.05); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--sys-border);">
-                    <p style="margin: 0 0 10px 0; font-size: 13px; color: var(--sys-text-muted);">Your link:</p>
-                    <input type="text" id="lc-output" readonly style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--sys-border); background: rgba(128,128,128,0.05); color: var(--sys-text); font-family: monospace; font-size: 12px; box-sizing: border-box;">
-                    <button onclick="copyLink()" class="modern-btn" style="margin-top: 10px; font-size: 12px;">📋 Copy</button>
-                </div>
-                <div id="lc-history" style="margin-top: 10px;">
-                    <p style="font-size: 11px; font-weight: 600; color: var(--sys-primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">History</p>
-                    <div id="lc-history-list" style="display: flex; flex-direction: column; gap: 5px; max-height: 120px; overflow-y: auto;"></div>
-                </div>
-            </div>
-        </div>
+        </div></div>
 
     <div id="notification-toast-container"></div>
 
@@ -624,7 +602,9 @@
             <div class="launcher-item" data-app-id="pokemon-window" data-icon="⚡" data-name="Pokemon" onclick="openApp('pokemon-window')"><div class="l-icon">⚡</div><span class="l-text">Pokemon</span></div>
             <div class="launcher-item" data-app-id="1v1lol-window" data-icon="🔫" data-name="1v1.LOL" onclick="openApp('1v1lol-window')"><div class="l-icon">🔫</div><span class="l-text">1v1.LOL</span></div>
         </div>
-    </div>
+                <div class="launcher-item" data-app-id="bitlife-window" data-icon="📱" data-name="Bitlife" onclick="openApp('bitlife-window')"><div class="l-icon">📱</div><span class="l-text">Bitlife</span></div>
+            <div class="launcher-item" data-app-id="footballbros-window" data-icon="🏈" data-name="Football Bros" onclick="openApp('footballbros-window')"><div class="l-icon">🏈</div><span class="l-text">Football Bros</span></div>
+</div>
 
     <div id="media-control-modal">
         <div class="media-modal-header">
@@ -708,4 +688,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
