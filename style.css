@@ -1818,3 +1818,214 @@ body, html { margin: 0; padding: 0; height: 100%; font-family: 'Google Sans', 'S
     display: block;
     animation: fadeIn 0.3s ease;
 }
+
+/* ===== V2.0 PLAY STORE STYLES ===== */
+
+/* Category Tabs in Sidebar */
+.ps-cat-btn {
+    flex: 1;
+    padding: 8px 0;
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: #9aa0a6;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+.ps-cat-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: #e8eaed;
+}
+.ps-cat-btn.active {
+    background: var(--ps-primary);
+    color: white;
+}
+
+/* Sliding Panels */
+.ps-slide-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ps-slide-panel.active {
+    transform: translateX(0);
+}
+.ps-slide-panel.slide-left {
+    transform: translateX(-100%);
+}
+.ps-slide-panel.slide-right {
+    transform: translateX(100%);
+}
+
+/* App/Game Detail Screen */
+#ps-detail-overlay {
+    background: linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%);
+}
+
+.ps-detail-banner {
+    width: 100%;
+    height: 200px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+}
+.ps-detail-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.ps-detail-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    background: rgba(255,255,255,0.1);
+    margin-bottom: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.ps-detail-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 8px 0;
+}
+.ps-detail-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.ps-detail-meta span {
+    font-size: 13px;
+    color: #9aa0a6;
+    background: rgba(255,255,255,0.05);
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+.ps-detail-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+.ps-detail-btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 24px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: inherit;
+}
+.ps-detail-btn.play {
+    background: var(--ps-primary);
+    color: white;
+}
+.ps-detail-btn.play:hover {
+    filter: brightness(1.1);
+    transform: scale(1.02);
+}
+.ps-detail-btn.install {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+.ps-detail-btn.install:hover {
+    background: rgba(255,255,255,0.2);
+}
+.ps-detail-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+.ps-detail-stat {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+}
+.ps-detail-stat .stat-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+}
+.ps-detail-stat .stat-label {
+    font-size: 11px;
+    color: #9aa0a6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.ps-detail-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #c5c5c5;
+    margin-bottom: 20px;
+}
+.ps-detail-controls {
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.ps-detail-controls h4 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #9aa0a6;
+}
+.ps-detail-controls p {
+    margin: 0;
+    font-size: 13px;
+    color: #c5c5c5;
+}
+
+/* App Cards */
+.ps-app-card {
+    background: var(--ps-card);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid transparent;
+    text-align: center;
+}
+.ps-app-card:hover {
+    background: var(--ps-card-hover);
+    border-color: var(--ps-border);
+    transform: translateY(-2px);
+}
+.ps-app-card .card-icon {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    background: rgba(255,255,255,0.05);
+    margin-bottom: 10px;
+}
+.ps-app-card .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ps-text);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ps-app-card .card-meta {
+    font-size: 11px;
+    color: var(--ps-text-muted);
+}
