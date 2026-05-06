@@ -1131,6 +1131,23 @@ const PS_GAMES = {
     'yanderesim-window': { id: 'yanderesim-window', name: 'Yandere Simulator', icon: '🔪', category: 'simulation', rating: 4.6, banner: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800', desc: 'Stealth simulation game.', controls: 'WASD to move, E to interact' },
     'pokemon-window': { id: 'pokemon-window', name: 'Pokemon', icon: '⚡', category: 'rpg', rating: 4.9, banner: 'https://images.unsplash.com/photo-1542779283-429eb70b4d98?q=80&w=800', desc: 'Catch and train Pokemon in this RPG adventure.', controls: 'Arrow keys to move, Z to interact' },
     '1v1lol-window': { id: '1v1lol-window', name: '1v1.LOL', icon: '🔫', category: 'action', rating: 4.7, banner: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800', desc: 'Build and battle in this competitive shooter.', controls: 'WASD to move, Mouse to aim/build' }
+,
+    'bitlife-window': { id: 'bitlife-window', name: 'Bitlife', icon: '📱', category: 'simulation', rating: 4.7, banner: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=800', desc: 'Live your entire life from birth to death in this text-based life simulator.', controls: 'Click to make choices' },
+    'footballbros-window': { id: 'footballbros-window', name: 'Football Bros', icon: '🏈', category: 'sports', rating: 4.6, banner: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=800', desc: 'Play football with your bros in this exciting sports game.', controls: 'Arrow keys to move, Space to action' }
+};
+
+// Play Store Apps Database
+const PS_APPS = {
+    'chrome-window': { id: 'chrome-window', name: 'Chrome', icon: '🌐', category: 'browser', rating: 4.9, banner: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=800', desc: 'Fast, secure web browser with built-in proxy support.', controls: 'Mouse and keyboard' },
+    'discord-window': { id: 'discord-window', name: 'Discord', icon: '💬', category: 'social', rating: 4.8, banner: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=800', desc: 'Chat and connect with friends and communities.', controls: 'Mouse and keyboard' },
+    'auraflix-window': { id: 'auraflix-window', name: 'AuraFlix', icon: '🎬', category: 'entertainment', rating: 4.7, banner: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=800', desc: 'Stream movies and shows on AuraFlix.', controls: 'Mouse and keyboard' },
+    'auramusic-window': { id: 'auramusic-window', name: 'Aura Music', icon: '🎵', category: 'entertainment', rating: 4.8, banner: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800', desc: 'Stream music from Spotify and SoundCloud.', controls: 'Mouse and keyboard' },
+    'files-window': { id: 'files-window', name: 'Files', icon: '📁', category: 'productivity', rating: 4.5, banner: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800', desc: 'Manage your local files and documents.', controls: 'Mouse and keyboard' },
+    'wordpad-window': { id: 'wordpad-window', name: 'Wordpad', icon: '📝', category: 'productivity', rating: 4.4, banner: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=800', desc: 'Create and edit text documents with rich formatting.', controls: 'Mouse and keyboard' },
+    'calc-window': { id: 'calc-window', name: 'Calculator', icon: '🧮', category: 'productivity', rating: 4.6, banner: 'https://images.unsplash.com/photo-1587145820266-a5951eebe0e3?q=80&w=800', desc: 'Standard calculator for quick math.', controls: 'Mouse and keyboard' },
+    'settings-window': { id: 'settings-window', name: 'Settings', icon: '⚙️', category: 'system', rating: 5.0, banner: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=800', desc: 'Configure your Aura OS experience.', controls: 'Mouse and keyboard' },
+    'robloxanimator-window': { id: 'robloxanimator-window', name: 'Roblox Animator', icon: '🎬', category: 'creative', rating: 4.5, banner: 'https://images.unsplash.com/photo-1616499370260-485b3e5ed653?q=80&w=800', desc: 'Create Roblox animations.', controls: 'Mouse and keyboard' },
+    'linkcreator-window': { id: 'linkcreator-window', name: 'Link Creator', icon: '🔗', category: 'productivity', rating: 4.3, banner: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=800', desc: 'Create and share custom links.', controls: 'Mouse and keyboard' }
 };
 
 // Play time tracking (stored per account)
@@ -1220,20 +1237,35 @@ function renderPlayStoreSidebar() {
 
     let html = '';
 
-    // Show installed games in sidebar
-    installed.forEach(app => {
-        const game = PS_GAMES[app.id];
-        if (game) {
-            const isActive = recent.length > 0 && recent[0] === app.id;
-            html += `<div class="ps-game-item ${isActive ? 'active' : ''}" onclick="playStoreSelectGame('${app.id}')">
-                <div class="ps-game-icon">${game.icon}</div>
-                <span>${game.name}</span>
-            </div>`;
+    if (psCurrentCategory === 'games') {
+        // Show installed games in sidebar
+        installed.forEach(app => {
+            const game = PS_GAMES[app.id];
+            if (game) {
+                const isActive = recent.length > 0 && recent[0] === app.id;
+                html += `<div class="ps-game-item ${isActive ? 'active' : ''}" onclick="openPlayStoreDetail('${app.id}', 'game')">
+                    <div class="ps-game-icon">${game.icon}</div>
+                    <span>${game.name}</span>
+                </div>`;
+            }
+        });
+        if (!installed.find(a => PS_GAMES[a.id])) {
+            html = '<div style="padding: 20px; text-align: center; color: #9aa0a6; font-size: 12px;">No games installed</div>';
         }
-    });
-
-    if (installed.length === 0) {
-        html = '<div style="padding: 20px; text-align: center; color: #9aa0a6; font-size: 12px;">No games installed</div>';
+    } else {
+        // Show installed apps in sidebar
+        installed.forEach(app => {
+            const appData = PS_APPS[app.id];
+            if (appData) {
+                html += `<div class="ps-game-item" onclick="openPlayStoreDetail('${app.id}', 'app')">
+                    <div class="ps-game-icon">${appData.icon}</div>
+                    <span>${appData.name}</span>
+                </div>`;
+            }
+        });
+        if (!installed.find(a => PS_APPS[a.id])) {
+            html = '<div style="padding: 20px; text-align: center; color: #9aa0a6; font-size: 12px;">No apps installed</div>';
+        }
     }
 
     list.innerHTML = html;
@@ -1261,7 +1293,7 @@ function renderFeaturedGame(appId) {
     if (!featured) return;
 
     featured.innerHTML = `
-        <div class="ps-featured-banner">
+        <div class="ps-featured-banner" onclick="openPlayStoreDetail('${appId}', 'game')" style="cursor: pointer;">
             <img src="${game.banner}" alt="${game.name}" onerror="this.style.display='none'">
             <div class="ps-featured-overlay">
                 <div class="ps-featured-tags">
@@ -1271,9 +1303,9 @@ function renderFeaturedGame(appId) {
                 </div>
                 <h2 class="ps-featured-title">${game.name}</h2>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <button class="ps-play-btn" onclick="openApp('${appId}')">▶ Play</button>
-                    <button class="ps-more-btn" onclick="toggleFavorite('${appId}')" title="Favorite">⭐</button>
-                    <button class="ps-more-btn" onclick="uninstallPlayStoreGame('${appId}')" title="Uninstall">🗑️</button>
+                    <button class="ps-play-btn" onclick="event.stopPropagation(); openApp('${appId}')">▶ Play</button>
+                    <button class="ps-more-btn" onclick="event.stopPropagation(); toggleFavorite('${appId}')" title="Favorite">⭐</button>
+                    <button class="ps-more-btn" onclick="event.stopPropagation(); uninstallPlayStoreGame('${appId}')" title="Uninstall">🗑️</button>
                 </div>
                 <div class="ps-stats-row">
                     <div class="ps-stat"><span>⏱️</span> <strong>Playtime</strong> ${timeStr}</div>
@@ -1282,7 +1314,7 @@ function renderFeaturedGame(appId) {
                 </div>
             </div>
         </div>
-        <div style="background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; margin-top: 15px;">
+        <div style="background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; margin-top: 15px; cursor: pointer;" onclick="openPlayStoreDetail('${appId}', 'game')">
             <p style="margin: 0 0 15px; font-size: 14px; line-height: 1.6; color: #c5c5c5;">${game.desc}</p>
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 <h4 style="margin: 0 0 8px; font-size: 13px; color: #9aa0a6;">Controls</h4>
@@ -1517,6 +1549,19 @@ function clearPlayStoreData() {
 }
 
 // Initialize Play Store when opened
+
+
+// Also init apps panel when store opens
+const originalOpenAppPS_v2 = openApp;
+openApp = function(appId) {
+    const result = originalOpenAppPS_v2(appId);
+    if (appId === 'store-window') {
+        setTimeout(() => {
+            renderPlayStoreApps();
+        }, 100);
+    }
+    return result;
+};
 const originalOpenAppPS = openApp;
 openApp = function(appId) {
     const result = originalOpenAppPS(appId);
@@ -1538,6 +1583,310 @@ openApp = function(appId) {
 
     return result;
 };
+
+// ===== PLAY STORE V2.0 CATEGORY & DETAIL SYSTEM =====
+
+let psCurrentCategory = 'games';
+
+function switchPlayStoreCategory(category) {
+    psCurrentCategory = category;
+    const gamesPanel = document.getElementById('ps-games-panel');
+    const appsPanel = document.getElementById('ps-apps-panel');
+    const gamesBtn = document.getElementById('ps-cat-games');
+    const appsBtn = document.getElementById('ps-cat-apps');
+
+    if (category === 'apps') {
+        gamesPanel.classList.remove('active');
+        gamesPanel.classList.add('slide-left');
+        appsPanel.style.transform = 'translateX(0)';
+        appsBtn.classList.add('active');
+        gamesBtn.classList.remove('active');
+        renderPlayStoreApps();
+    } else {
+        appsPanel.style.transform = 'translateX(100%)';
+        gamesPanel.classList.remove('slide-left');
+        gamesPanel.classList.add('active');
+        gamesBtn.classList.add('active');
+        appsBtn.classList.remove('active');
+    }
+
+    // Update sidebar list
+    renderPlayStoreSidebar();
+}
+
+function renderPlayStoreApps() {
+    const grid = document.getElementById('ps-apps-grid');
+    if (!grid) return;
+
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installedIds = installed.map(a => a.id);
+
+    let html = '';
+    Object.values(PS_APPS).forEach(app => {
+        const isInstalled = installedIds.includes(app.id);
+        html += `<div class="ps-app-card" onclick="openPlayStoreDetail('${app.id}', 'app')">
+            <div class="card-icon">${app.icon}</div>
+            <div class="card-title">${app.name}</div>
+            <div class="card-meta">${app.category} ${isInstalled ? '✓ Installed' : ''}</div>
+        </div>`;
+    });
+
+    grid.innerHTML = html;
+}
+
+function openPlayStoreDetail(itemId, type) {
+    const overlay = document.getElementById('ps-detail-overlay');
+    const content = document.getElementById('ps-detail-content');
+    if (!overlay || !content) return;
+
+    const isGame = type === 'game';
+    const item = isGame ? PS_GAMES[itemId] : PS_APPS[itemId];
+    if (!item) return;
+
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const isInstalled = installed.find(a => a.id === itemId);
+
+    // Get playtime data
+    const playTimeData = getPlayTimeData();
+    const pt = playTimeData[itemId] || { totalSeconds: 0, lastOpened: null, sessions: 0 };
+    const timeStr = formatPlayTime(pt.totalSeconds);
+    const lastPlayed = pt.lastOpened ? new Date(pt.lastOpened).toLocaleDateString() : 'Never';
+
+    content.innerHTML = `
+        <div class="ps-detail-banner">
+            <img src="${item.banner}" alt="${item.name}" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #3a7bd5, #00d2ff)';">
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px;">
+            <div class="ps-detail-icon">${item.icon}</div>
+            <div style="flex: 1;">
+                <h2 class="ps-detail-title">${item.name}</h2>
+                <div class="ps-detail-meta">
+                    <span>⭐ ${item.rating}</span>
+                    <span>${item.category.charAt(0).toUpperCase() + item.category.slice(1)}</span>
+                    <span>${isGame ? '🎮 Game' : '📱 App'}</span>
+                </div>
+                <div class="ps-detail-actions">
+                    ${isInstalled 
+                        ? `<button class="ps-detail-btn play" onclick="openApp('${itemId}')">▶ Play</button>`
+                        : `<button class="ps-detail-btn install" onclick="installPlayStoreItem('${itemId}', '${item.icon}', '${item.name}', '${type}')">⬇ Install</button>`
+                    }
+                    <button class="ps-detail-btn install" onclick="toggleFavorite('${itemId}')">⭐ Favorite</button>
+                </div>
+            </div>
+        </div>
+        <div class="ps-detail-stats">
+            <div class="ps-detail-stat">
+                <div class="stat-value">⏱️ ${timeStr}</div>
+                <div class="stat-label">Playtime</div>
+            </div>
+            <div class="ps-detail-stat">
+                <div class="stat-value">🔥 ${pt.sessions}</div>
+                <div class="stat-label">Sessions</div>
+            </div>
+            <div class="ps-detail-stat">
+                <div class="stat-value">📅 ${lastPlayed}</div>
+                <div class="stat-label">Last Played</div>
+            </div>
+        </div>
+        <div class="ps-detail-desc">${item.desc}</div>
+        <div class="ps-detail-controls">
+            <h4>Controls</h4>
+            <p>${item.controls}</p>
+        </div>
+    `;
+
+    overlay.style.transform = 'translateX(0)';
+}
+
+function closePlayStoreDetail() {
+    const overlay = document.getElementById('ps-detail-overlay');
+    if (overlay) overlay.style.transform = 'translateX(100%)';
+}
+
+function installPlayStoreItem(appId, icon, name, type) {
+    const launcherList = document.getElementById('launcher-list');
+    const existingItem = launcherList ? launcherList.querySelector(`[data-app-id="${appId}"]`) : null;
+    if (existingItem) {
+        notificationMgr.showNotification({ title: "Already Installed", message: `${name} is already installed.`, icon: "sparkles" });
+        return;
+    }
+
+    notificationMgr.showNotification({ title: "Installing...", message: `${name} is being installed.`, icon: "sparkles" });
+
+    setTimeout(() => {
+        restoreAppToLauncher(appId, icon, name);
+        saveAppToStorage(appId, icon, name);
+
+        notificationMgr.showNotification({ title: "Installed!", message: `${name} has been added to your library.`, icon: "sparkles" });
+
+        // Refresh UI
+        renderPlayStoreSidebar();
+        renderPlayStoreLibrary();
+        renderPlayStoreStore();
+        renderPlayStoreApps();
+
+        // If detail view is open, refresh it
+        const overlay = document.getElementById('ps-detail-overlay');
+        if (overlay && overlay.style.transform === 'translateX(0px)') {
+            openPlayStoreDetail(appId, type);
+        }
+    }, 1000);
+}
+
+// Override renderPlayStoreStore to make cards clickable for detail
+const originalRenderPlayStoreStore = renderPlayStoreStore;
+renderPlayStoreStore = function() {
+    const grid = document.getElementById('ps-store-grid');
+    if (!grid) return;
+
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installedIds = installed.map(a => a.id);
+
+    let html = '';
+    Object.values(PS_GAMES).forEach(game => {
+        const isInstalled = installedIds.includes(game.id);
+        html += `<div class="ps-store-card" data-category="${game.category}" onclick="openPlayStoreDetail('${game.id}', 'game')">
+            <div class="card-icon">${game.icon}</div>
+            <div class="card-title">${game.name}</div>
+            <div class="card-meta">${game.category} • ⭐${game.rating}</div>
+            <div class="install-overlay">
+                ${isInstalled 
+                    ? `<button onclick="event.stopPropagation(); openApp('${game.id}')">▶ Play</button>`
+                    : `<button onclick="event.stopPropagation(); installPlayStoreGame('${game.id}', '${game.icon}', '${game.name}')">⬇ Install</button>`
+                }
+            </div>
+        </div>`;
+    });
+
+    grid.innerHTML = html;
+};
+
+// Override renderPlayStoreHome to make recent games clickable
+const originalRenderPlayStoreHome = renderPlayStoreHome;
+renderPlayStoreHome = function() {
+    const recent = getRecentPlays();
+    const emptyDiv = document.getElementById('ps-home-empty');
+    const contentDiv = document.getElementById('ps-home-content');
+    const recentSection = document.getElementById('ps-recent-section');
+    const recentGrid = document.getElementById('ps-recent-grid');
+
+    if (recent.length === 0) {
+        if (emptyDiv) emptyDiv.style.display = 'block';
+        if (contentDiv) contentDiv.style.display = 'none';
+        return;
+    }
+
+    if (emptyDiv) emptyDiv.style.display = 'none';
+    if (contentDiv) contentDiv.style.display = 'block';
+
+    renderFeaturedGame(recent[0]);
+
+    if (recentSection && recentGrid) {
+        recentSection.style.display = 'block';
+        recentGrid.innerHTML = recent.slice(1).map(appId => {
+            const game = PS_GAMES[appId];
+            if (!game) return '';
+            return `<div class="ps-store-card" onclick="openPlayStoreDetail('${appId}', 'game')">
+                <div class="card-icon">${game.icon}</div>
+                <div class="card-title">${game.name}</div>
+                <div class="card-meta">${game.category} • ⭐${game.rating}</div>
+            </div>`;
+        }).join('');
+    }
+};
+
+// Override renderPlayStoreLibrary to make cards clickable
+const originalRenderPlayStoreLibrary = renderPlayStoreLibrary;
+renderPlayStoreLibrary = function() {
+    const grid = document.getElementById('ps-library-grid');
+    const empty = document.getElementById('ps-library-empty');
+    if (!grid) return;
+
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const playTimeData = getPlayTimeData();
+
+    if (installed.length === 0) {
+        grid.style.display = 'none';
+        if (empty) empty.style.display = 'block';
+        return;
+    }
+
+    grid.style.display = 'grid';
+    if (empty) empty.style.display = 'none';
+
+    grid.innerHTML = installed.map(app => {
+        const game = PS_GAMES[app.id];
+        const appData = PS_APPS[app.id];
+        const item = game || appData;
+        if (!item) return '';
+        const pt = playTimeData[app.id] || { totalSeconds: 0 };
+        const timeStr = formatPlayTime(pt.totalSeconds);
+        return `<div class="ps-lib-card" onclick="openPlayStoreDetail('${app.id}', '${game ? 'game' : 'app'}')">
+            <div class="lib-icon">${item.icon}</div>
+            <div class="lib-title">${item.name}</div>
+            <div class="lib-playtime">⏱️ ${timeStr}</div>
+        </div>`;
+    }).join('');
+};
+
+// ===== SERVER WARNING BANNER =====
+function initServerWarningBanner() {
+    if (sessionStorage.getItem('server_warning_shown')) return;
+
+    const banner = document.getElementById('server-warning-banner');
+    if (!banner) return;
+
+    banner.style.display = 'flex';
+    banner.style.opacity = '1';
+    banner.style.transform = 'translateY(0)';
+
+    setTimeout(() => {
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(-100%)';
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 1000);
+        sessionStorage.setItem('server_warning_shown', 'true');
+    }, 10000);
+}
+
+// ===== UPDATE MODAL V2.0 =====
+const originalShowUpdateModal = showUpdateModal;
+showUpdateModal = function() {
+    const modal = document.getElementById('update-modal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+
+    const hasSeenModal = localStorage.getItem('update_v20_seen');
+    const continueBtn = document.getElementById('update-continue-btn');
+
+    if (hasSeenModal) {
+        continueBtn.disabled = false;
+        continueBtn.classList.add('active');
+        continueBtn.innerText = 'Continue';
+    } else {
+        continueBtn.disabled = true;
+        continueBtn.classList.remove('active');
+
+        let countdown = 5;
+        continueBtn.innerText = `Continue (${countdown})`;
+
+        const timer = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                continueBtn.innerText = `Continue (${countdown})`;
+            } else {
+                clearInterval(timer);
+                continueBtn.innerText = 'Continue';
+                continueBtn.disabled = false;
+                continueBtn.classList.add('active');
+                localStorage.setItem('update_v20_seen', 'true');
+            }
+        }, 1000);
+    }
+};
+
 
 // ===== END PLAY STORE V2 =====
 
@@ -2356,6 +2705,8 @@ function closeWelcomeModal() {
     triggerInitialNotifications();
 }
 
+
+    initServerWarningBanner();
 function initializeDesktop() {
     updateCalendarWidget();
     initChromeProxy();
