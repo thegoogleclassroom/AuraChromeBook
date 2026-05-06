@@ -1233,39 +1233,30 @@ function renderPlayStoreSidebar() {
     if (!list) return;
 
     const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installedIds = installed.map(a => a.id);
     const recent = getRecentPlays();
 
     let html = '';
 
     if (psCurrentCategory === 'games') {
-        // Show installed games in sidebar
-        installed.forEach(app => {
-            const game = PS_GAMES[app.id];
-            if (game) {
-                const isActive = recent.length > 0 && recent[0] === app.id;
-                html += `<div class="ps-game-item ${isActive ? 'active' : ''}" onclick="openPlayStoreDetail('${app.id}', 'game')">
-                    <div class="ps-game-icon">${game.icon}</div>
-                    <span>${game.name}</span>
-                </div>`;
-            }
+        // Show ALL games in sidebar (browseable without install)
+        Object.values(PS_GAMES).forEach(game => {
+            const isInstalled = installedIds.includes(game.id);
+            const isActive = recent.length > 0 && recent[0] === game.id;
+            html += `<div class="ps-game-item ${isActive ? 'active' : ''}" onclick="openPlayStoreDetail('${game.id}', 'game')">
+                <div class="ps-game-icon">${game.icon}</div>
+                <span>${game.name} ${isInstalled ? '✓' : ''}</span>
+            </div>`;
         });
-        if (!installed.find(a => PS_GAMES[a.id])) {
-            html = '<div style="padding: 20px; text-align: center; color: #9aa0a6; font-size: 12px;">No games installed</div>';
-        }
     } else {
-        // Show installed apps in sidebar
-        installed.forEach(app => {
-            const appData = PS_APPS[app.id];
-            if (appData) {
-                html += `<div class="ps-game-item" onclick="openPlayStoreDetail('${app.id}', 'app')">
-                    <div class="ps-game-icon">${appData.icon}</div>
-                    <span>${appData.name}</span>
-                </div>`;
-            }
+        // Show ALL apps in sidebar
+        Object.values(PS_APPS).forEach(app => {
+            const isInstalled = installedIds.includes(app.id);
+            html += `<div class="ps-game-item" onclick="openPlayStoreDetail('${app.id}', 'app')">
+                <div class="ps-game-icon">${app.icon}</div>
+                <span>${app.name} ${isInstalled ? '✓' : ''}</span>
+            </div>`;
         });
-        if (!installed.find(a => PS_APPS[a.id])) {
-            html = '<div style="padding: 20px; text-align: center; color: #9aa0a6; font-size: 12px;">No apps installed</div>';
-        }
     }
 
     list.innerHTML = html;
@@ -1399,16 +1390,34 @@ function renderPlayStoreStore() {
     const installedIds = installed.map(a => a.id);
 
     let html = '';
+
+    // Render all games
     Object.values(PS_GAMES).forEach(game => {
         const isInstalled = installedIds.includes(game.id);
-        html += `<div class="ps-store-card" data-category="${game.category}">
+        html += `<div class="ps-store-card" data-category="${game.category}" onclick="openPlayStoreDetail('${game.id}', 'game')">
             <div class="card-icon">${game.icon}</div>
             <div class="card-title">${game.name}</div>
             <div class="card-meta">${game.category} • ⭐${game.rating}</div>
-            <div class="install-overlay">
+            <div class="install-overlay" onclick="event.stopPropagation();">
                 ${isInstalled 
                     ? `<button onclick="openApp('${game.id}')">▶ Play</button>`
                     : `<button onclick="installPlayStoreGame('${game.id}', '${game.icon}', '${game.name}')">⬇ Install</button>`
+                }
+            </div>
+        </div>`;
+    });
+
+    // Render all apps
+    Object.values(PS_APPS).forEach(app => {
+        const isInstalled = installedIds.includes(app.id);
+        html += `<div class="ps-store-card" data-category="apps" onclick="openPlayStoreDetail('${app.id}', 'app')">
+            <div class="card-icon">${app.icon}</div>
+            <div class="card-title">${app.name}</div>
+            <div class="card-meta">${app.category} • ⭐${app.rating}</div>
+            <div class="install-overlay" onclick="event.stopPropagation();">
+                ${isInstalled 
+                    ? `<button onclick="openApp('${app.id}')">▶ Open</button>`
+                    : `<button onclick="installPlayStoreGame('${app.id}', '${app.icon}', '${app.name}')">⬇ Install</button>`
                 }
             </div>
         </div>`;
@@ -1487,6 +1496,44 @@ function toggleFavorite(appId) {
 }
 
 // Tab switching
+function renderPlayStoreFavorites() {
+    const grid = document.getElementById('ps-favorites-grid');
+    const empty = document.getElementById('ps-favorites-empty');
+    if (!grid) return;
+
+    const favs = getFavorites();
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installedIds = installed.map(a => a.id);
+
+    if (favs.length === 0) {
+        grid.style.display = 'none';
+        if (empty) empty.style.display = 'block';
+        return;
+    }
+
+    grid.style.display = 'grid';
+    if (empty) empty.style.display = 'none';
+
+    grid.innerHTML = favs.map(appId => {
+        const game = PS_GAMES[appId];
+        const app = PS_APPS[appId];
+        const item = game || app;
+        if (!item) return '';
+        const isInstalled = installedIds.includes(appId);
+        return `<div class="ps-store-card" onclick="openPlayStoreDetail('${appId}', '${game ? 'game' : 'app'}')">
+            <div class="card-icon">${item.icon}</div>
+            <div class="card-title">${item.name}</div>
+            <div class="card-meta">${item.category} • ⭐${item.rating} ${isInstalled ? '✓' : ''}</div>
+            <div class="install-overlay" onclick="event.stopPropagation();">
+                ${isInstalled 
+                    ? `<button onclick="openApp('${appId}')">▶ Play</button>`
+                    : `<button onclick="installPlayStoreGame('${appId}', '${item.icon}', '${item.name}')">⬇ Install</button>`
+                }
+            </div>
+        </div>`;
+    }).join('');
+}
+
 function showPlayStoreTab(tabName) {
     // Update nav buttons
     document.querySelectorAll('.ps-nav-btn').forEach(btn => {
@@ -1504,12 +1551,13 @@ function showPlayStoreTab(tabName) {
     if (tabName === 'home') renderPlayStoreHome();
     if (tabName === 'library') renderPlayStoreLibrary();
     if (tabName === 'store') renderPlayStoreStore();
+    if (tabName === 'favorites') renderPlayStoreFavorites();
 }
 
 // Filter store by category
 function filterStoreCategory(category) {
     document.querySelectorAll('.ps-category').forEach(cat => {
-        cat.classList.toggle('active', cat.innerText.toLowerCase() === category);
+        cat.classList.toggle('active', cat.dataset.cat === category || cat.innerText.toLowerCase() === category);
     });
 
     const cards = document.querySelectorAll('#ps-store-grid .ps-store-card');
