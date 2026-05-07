@@ -1383,18 +1383,19 @@ function renderPlayStoreLibrary() {
 
 // Render Store tab
 function renderPlayStoreStore() {
-    const grid = document.getElementById('ps-store-grid');
-    if (!grid) return;
+    const gamesGrid = document.getElementById('ps-store-grid');
+    const appsGrid = document.getElementById('ps-apps-store-grid');
+    const appsEmpty = document.getElementById('ps-apps-store-empty');
+    if (!gamesGrid) return;
 
     const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
     const installedIds = installed.map(a => a.id);
 
-    let html = '';
-
-    // Render all games
+    // Render games in games grid
+    let gamesHtml = '';
     Object.values(PS_GAMES).forEach(game => {
         const isInstalled = installedIds.includes(game.id);
-        html += `<div class="ps-store-card" data-category="${game.category}" onclick="openPlayStoreDetail('${game.id}', 'game')">
+        gamesHtml += `<div class="ps-store-card" data-category="${game.category}" onclick="openPlayStoreDetail('${game.id}', 'game')">
             <div class="card-icon">${game.icon}</div>
             <div class="card-title">${game.name}</div>
             <div class="card-meta">${game.category} • ⭐${game.rating}</div>
@@ -1406,24 +1407,38 @@ function renderPlayStoreStore() {
             </div>
         </div>`;
     });
+    gamesGrid.innerHTML = gamesHtml;
 
-    // Render all apps
-    Object.values(PS_APPS).forEach(app => {
-        const isInstalled = installedIds.includes(app.id);
-        html += `<div class="ps-store-card" data-category="apps" onclick="openPlayStoreDetail('${app.id}', 'app')">
-            <div class="card-icon">${app.icon}</div>
-            <div class="card-title">${app.name}</div>
-            <div class="card-meta">${app.category} • ⭐${app.rating}</div>
-            <div class="install-overlay" onclick="event.stopPropagation();">
-                ${isInstalled 
-                    ? `<button onclick="openApp('${app.id}')">▶ Open</button>`
-                    : `<button onclick="installPlayStoreGame('${app.id}', '${app.icon}', '${app.name}')">⬇ Install</button>`
-                }
-            </div>
-        </div>`;
-    });
+    // Render apps in separate apps grid
+    if (appsGrid) {
+        let appsHtml = '';
+        Object.values(PS_APPS).forEach(app => {
+            const isInstalled = installedIds.includes(app.id);
+            appsHtml += `<div class="ps-store-card" data-category="apps" onclick="openPlayStoreDetail('${app.id}', 'app')">
+                <div class="card-icon">${app.icon}</div>
+                <div class="card-title">${app.name}</div>
+                <div class="card-meta">${app.category} • ⭐${app.rating}</div>
+                <div class="install-overlay" onclick="event.stopPropagation();">
+                    ${isInstalled 
+                        ? `<button onclick="openApp('${app.id}')">▶ Open</button>`
+                        : `<button onclick="installPlayStoreGame('${app.id}', '${app.icon}', '${app.name}')">⬇ Install</button>`
+                    }
+                </div>
+            </div>`;
+        });
+        appsGrid.innerHTML = appsHtml;
 
-    grid.innerHTML = html;
+        // Show/hide empty state
+        if (appsEmpty) {
+            if (Object.keys(PS_APPS).length === 0) {
+                appsEmpty.style.display = 'block';
+                appsGrid.style.display = 'none';
+            } else {
+                appsEmpty.style.display = 'none';
+                appsGrid.style.display = 'grid';
+            }
+        }
+    }
 }
 
 // Install game from Play Store
@@ -1560,25 +1575,57 @@ function filterStoreCategory(category) {
         cat.classList.toggle('active', cat.dataset.cat === category || cat.innerText.toLowerCase() === category);
     });
 
-    const cards = document.querySelectorAll('#ps-store-grid .ps-store-card');
-    cards.forEach(card => {
-        if (category === 'all' || card.dataset.category === category) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
-    });
+    const gameCards = document.querySelectorAll('#ps-store-grid .ps-store-card');
+    const appsGrid = document.getElementById('ps-apps-store-grid');
+    const appsSection = appsGrid ? appsGrid.parentElement : null;
+
+    if (category === 'all') {
+        // Show everything
+        gameCards.forEach(card => card.style.display = 'block');
+        if (appsSection) appsSection.style.display = 'block';
+        if (appsGrid) appsGrid.style.display = 'grid';
+    } else if (category === 'apps') {
+        // Show only apps section, hide all games
+        gameCards.forEach(card => card.style.display = 'none');
+        if (appsSection) appsSection.style.display = 'block';
+        if (appsGrid) appsGrid.style.display = 'grid';
+    } else {
+        // Show only matching games, hide apps section
+        gameCards.forEach(card => {
+            card.style.display = card.dataset.category === category ? 'block' : 'none';
+        });
+        if (appsSection) appsSection.style.display = 'none';
+    }
 }
 
 // Search store games
 function filterPlayStoreGames() {
     const query = document.getElementById('ps-store-search').value.toLowerCase();
-    const cards = document.querySelectorAll('#ps-store-grid .ps-store-card');
+    const gameCards = document.querySelectorAll('#ps-store-grid .ps-store-card');
+    const appCards = document.querySelectorAll('#ps-apps-store-grid .ps-store-card');
+    const appsSection = document.getElementById('ps-apps-store-grid')?.parentElement;
 
-    cards.forEach(card => {
+    let hasGameMatches = false;
+    let hasAppMatches = false;
+
+    gameCards.forEach(card => {
         const title = card.querySelector('.card-title').innerText.toLowerCase();
-        card.style.display = title.includes(query) ? 'block' : 'none';
+        const visible = title.includes(query);
+        card.style.display = visible ? 'block' : 'none';
+        if (visible) hasGameMatches = true;
     });
+
+    appCards.forEach(card => {
+        const title = card.querySelector('.card-title').innerText.toLowerCase();
+        const visible = title.includes(query);
+        card.style.display = visible ? 'block' : 'none';
+        if (visible) hasAppMatches = true;
+    });
+
+    // Show/hide apps section based on search results
+    if (appsSection) {
+        appsSection.style.display = hasAppMatches ? 'block' : 'none';
+    }
 }
 
 // Clear all Play Store data
@@ -2988,17 +3035,36 @@ document.addEventListener('click', (e) => {
 
 function toggleQuickSettings() { 
     if (!quickSettings) return;
-    quickSettings.style.display = quickSettings.style.display === 'none' ? 'block' : 'none'; 
-    if (launcherMenu) launcherMenu.style.display = 'none'; 
+    if (quickSettings.style.display === 'none') {
+        quickSettings.style.display = 'block';
+        quickSettings.style.zIndex = '99999';
+        if (launcherMenu) launcherMenu.style.display = 'none';
+        activeGameWindow = null; // Reset so keys don't go to game
+    } else {
+        quickSettings.style.display = 'none';
+        quickSettings.style.zIndex = '9999';
+    }
 }
 
 function toggleMenu() { 
     if (!launcherMenu) return;
-    launcherMenu.style.display = launcherMenu.style.display === 'none' ? 'flex' : 'none'; 
-    if (quickSettings) quickSettings.style.display = 'none'; 
-    if (launcherMenu.style.display === 'flex') {
+
+    if (launcherMenu.style.display === 'none') {
+        // Opening launcher - ensure it's above ALL windows
+        launcherMenu.style.display = 'flex';
+        launcherMenu.style.zIndex = '99999'; // Force above everything
+        if (quickSettings) quickSettings.style.display = 'none';
+
+        // Focus the search input
         const searchInput = document.getElementById('launcher-search');
         if (searchInput) searchInput.focus();
+
+        // Reset active game window so keys don't go to game while launcher is open
+        activeGameWindow = null;
+    } else {
+        // Closing launcher
+        launcherMenu.style.display = 'none';
+        launcherMenu.style.zIndex = '9998'; // Reset to default
     }
 }
 
@@ -3119,12 +3185,160 @@ function toggleApp(appId) {
 
 function bringToFront(elmnt) { 
     highestZ++; 
+    // Cap z-index so windows never go above launcher/quick settings
+    if (highestZ >= 9990) highestZ = 11;
     elmnt.style.zIndex = highestZ; 
     const iframe = elmnt.querySelector('iframe');
     if(iframe && iframe.contentWindow) {
         iframe.focus();
     }
 }
+
+
+// --- IFRAME FOCUS & KEYBOARD FIX ---
+// Track the currently active window for keyboard forwarding
+let activeGameWindow = null;
+
+// Override bringToFront to also track active window and focus iframe properly
+const originalBringToFront = bringToFront;
+bringToFront = function(elmnt) {
+    originalBringToFront(elmnt);
+    activeGameWindow = elmnt.id;
+
+    // Focus the iframe content window for keyboard capture
+    const iframe = elmnt.querySelector('iframe');
+    if (iframe) {
+        // Use contentWindow.focus() instead of iframe.focus()
+        try {
+            iframe.contentWindow.focus();
+        } catch(e) {
+            // Cross-origin might block this, fallback to iframe element focus
+            iframe.focus();
+        }
+
+        // Also ensure the iframe is clickable by adding a one-time click handler
+        // that refocuses it (for games that lose focus)
+        const contentArea = elmnt.querySelector('.window-content');
+        if (contentArea) {
+            contentArea.onclick = function(e) {
+                // Only focus if clicking on the content area background, not buttons
+                if (e.target === contentArea || e.target.tagName === 'IFRAME') {
+                    try {
+                        iframe.contentWindow.focus();
+                    } catch(err) {
+                        iframe.focus();
+                    }
+                }
+            };
+        }
+    }
+};
+
+// Global keyboard event forwarding to active iframe
+// This captures keys at the document level and sends them to the active game
+document.addEventListener('keydown', function(e) {
+    if (!activeGameWindow) return;
+
+    const win = document.getElementById(activeGameWindow);
+    if (!win || win.style.display === 'none' || win.classList.contains('minimized')) {
+        activeGameWindow = null;
+        return;
+    }
+
+    const iframe = win.querySelector('iframe');
+    if (!iframe || !iframe.contentWindow) return;
+
+    // Don't forward if user is typing in an input/textarea in the parent
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) {
+        return;
+    }
+
+    // Forward the keyboard event to the iframe
+    try {
+        // Try to focus the iframe first
+        iframe.contentWindow.focus();
+
+        // For same-origin iframes, we can dispatch the event
+        // For cross-origin, focusing is the best we can do
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        if (iframeDoc) {
+            const evt = new KeyboardEvent('keydown', {
+                key: e.key,
+                code: e.code,
+                keyCode: e.keyCode,
+                which: e.which,
+                ctrlKey: e.ctrlKey,
+                shiftKey: e.shiftKey,
+                altKey: e.altKey,
+                metaKey: e.metaKey,
+                bubbles: true
+            });
+            iframeDoc.dispatchEvent(evt);
+
+            // Prevent default browser actions for game keys (WASD, Space, etc.)
+            if (['w','a','s','d','W','A','S','D',' ','Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Shift','Control'].includes(e.key) || 
+                [87,65,83,68,32,38,40,37,39,16,17].includes(e.keyCode)) {
+                e.preventDefault();
+            }
+        }
+    } catch(err) {
+        // Cross-origin restriction - just ensure focus is there
+        iframe.focus();
+    }
+}, true); // Use capture phase to get events before they bubble
+
+// Also handle keyup for games that need it
+document.addEventListener('keyup', function(e) {
+    if (!activeGameWindow) return;
+
+    const win = document.getElementById(activeGameWindow);
+    if (!win || win.style.display === 'none' || win.classList.contains('minimized')) return;
+
+    const iframe = win.querySelector('iframe');
+    if (!iframe) return;
+
+    try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        if (iframeDoc) {
+            const evt = new KeyboardEvent('keyup', {
+                key: e.key,
+                code: e.code,
+                keyCode: e.keyCode,
+                which: e.which,
+                ctrlKey: e.ctrlKey,
+                shiftKey: e.shiftKey,
+                altKey: e.altKey,
+                metaKey: e.metaKey,
+                bubbles: true
+            });
+            iframeDoc.dispatchEvent(evt);
+        }
+    } catch(err) {
+        // Cross-origin - ignore
+    }
+}, true);
+
+// Make all windows focusable by adding tabindex
+// This allows the window itself to receive focus events
+document.querySelectorAll('.window').forEach(win => {
+    win.setAttribute('tabindex', '-1');
+    win.style.outline = 'none';
+});
+
+// When clicking on a window header, focus the window and its iframe
+document.querySelectorAll('.window-header').forEach(header => {
+    header.addEventListener('click', function() {
+        const win = this.closest('.window');
+        if (win) {
+            win.focus();
+            const iframe = win.querySelector('iframe');
+            if (iframe) {
+                try { iframe.contentWindow.focus(); } catch(e) { iframe.focus(); }
+            }
+        }
+    });
+});
 
 function updateTaskbarIndicator(appId, isActive) {
     const icon = document.querySelector(`button[onclick*="'${appId}'"]`);
