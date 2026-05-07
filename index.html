@@ -8,8 +8,6 @@
     <link id="page-favicon" rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==">
     <base target="_blank">
 <base target="_blank">
-<base target="_blank">
-<base target="_blank">
 </head>
 <body data-theme="dark">
     <div id="boot-screen">
@@ -458,12 +456,12 @@
                         <div style="padding: 0 15px 15px;">
                             <button onclick="showPlayStoreTab('favorites')" id="ps-fav-btn" style="background: transparent; border: none; color: #ffd700; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 8px; transition: 0.2s;">⭐</button>
                         </div>
-                        <div <div id="ps-sidebar-categories" style="padding: 0 15px 10px; display: flex; gap: 8px;">
+                        <div id="ps-sidebar-categories" style="padding: 0 15px 10px; display: flex; gap: 8px;">
                             <button id="ps-sidebar-games-btn" onclick="switchSidebarCategory('games')" style="flex: 1; padding: 8px 0; background: var(--ps-primary); color: white; border: none; border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer; transition: 0.2s; font-family: inherit;">🎮 Games</button>
                             <button id="ps-sidebar-apps-btn" onclick="switchSidebarCategory('apps')" style="flex: 1; padding: 8px 0; background: rgba(255,255,255,0.05); color: #9aa0a6; border: none; border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer; transition: 0.2s; font-family: inherit;">📱 Apps</button>
                         </div>
                         <div id="ps-app-list" style="flex: 1; overflow-y: auto; display: none; flex-direction: column; gap: 2px;"></div>
-id="ps-game-list" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;"></div>
+                        <div id="ps-game-list" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;"></div>
                     </div>
 
                     <!-- Main Content -->
@@ -522,8 +520,8 @@ id="ps-game-list" style="flex: 1; overflow-y: auto; display: flex; flex-directio
                                     <span class="ps-category" data-cat="rpg" onclick="filterStoreCategory('rpg')">RPG</span>
                                     <span class="ps-category" data-cat="simulation" onclick="filterStoreCategory('simulation')">Simulation</span>
                                     <span class="ps-category" data-cat="apps" onclick="filterStoreCategory('apps')">Apps</span>
+                                </div>
                                 <div id="ps-store-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px;"></div>
-                            </div>
                                 <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.1);">
                                     <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 500;">📱 Apps</h3>
                                     <div id="ps-apps-store-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px;"></div>
@@ -532,7 +530,7 @@ id="ps-game-list" style="flex: 1; overflow-y: auto; display: flex; flex-directio
                                         <p style="margin: 0; font-size: 13px;">No apps found.</p>
                                     </div>
                                 </div>
-
+                            </div>
 
                             <!-- FAVORITES TAB -->
                             <div id="ps-tab-favorites" class="ps-tab" style="display: none;">
@@ -546,6 +544,7 @@ id="ps-game-list" style="flex: 1; overflow-y: auto; display: flex; flex-directio
                             </div>
 
                             <!-- SETTINGS TAB -->
+                            <div id="ps-tab-settings" class="ps-tab" style="display: none;">
                                 <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 500;">Play Store Settings</h3>
                                 <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin-bottom: 15px;">
                                     <h4 style="margin: 0 0 10px; font-size: 14px; color: #9aa0a6;">Data Usage</h4>
@@ -555,20 +554,19 @@ id="ps-game-list" style="flex: 1; overflow-y: auto; display: flex; flex-directio
                             </div>
 
                         </div>
-                    
-                    <!-- Detail Overlay (Game/App Modal) -->
-                    <div id="ps-detail-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%); z-index: 100; transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); overflow-y: auto; padding: 30px; box-sizing: border-box;">
-                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
-                            <button onclick="closePlayStoreDetail()" style="background: rgba(255,255,255,0.1); border: none; color: #e8eaed; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s;">←</button>
-                            <span style="font-size: 16px; font-weight: 500; color: #e8eaed;">Back to Store</span>
+
+                        <!-- Detail Overlay (Game/App Modal) -->
+                        <div id="ps-detail-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%); z-index: 100; transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); overflow-y: auto; padding: 30px; box-sizing: border-box;">
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                                <button onclick="closePlayStoreDetail()" style="background: rgba(255,255,255,0.1); border: none; color: #e8eaed; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s;">←</button>
+                                <span style="font-size: 16px; font-weight: 500; color: #e8eaed;">Back to Store</span>
+                            </div>
+                            <div id="ps-detail-content"></div>
                         </div>
-                        <div id="ps-detail-content"></div>
                     </div>
-</div>
                 </div>
             </div>
-        </div>
-<div class="window" id="infinitecraft-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="infinitecraft-window-header"><span class="window-title">⚗️ Infinite Craft</span><div><button class="win-btn" onclick="minimizeApp('infinitecraft-window')">−</button><button class="win-btn" onclick="maximizeApp('infinitecraft-window')">□</button><button class="win-btn close-btn" onclick="closeApp('infinitecraft-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/infinitecraft.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
+        </div><div class="window" id="infinitecraft-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="infinitecraft-window-header"><span class="window-title">⚗️ Infinite Craft</span><div><button class="win-btn" onclick="minimizeApp('infinitecraft-window')">−</button><button class="win-btn" onclick="maximizeApp('infinitecraft-window')">□</button><button class="win-btn close-btn" onclick="closeApp('infinitecraft-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/infinitecraft.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="paperio-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="paperio-window-header"><span class="window-title">📄 Paper.io</span><div><button class="win-btn" onclick="minimizeApp('paperio-window')">−</button><button class="win-btn" onclick="maximizeApp('paperio-window')">□</button><button class="win-btn close-btn" onclick="closeApp('paperio-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/paperio.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="parkingfury-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="parkingfury-window-header"><span class="window-title">🅿️ Parking Fury</span><div><button class="win-btn" onclick="minimizeApp('parkingfury-window')">−</button><button class="win-btn" onclick="maximizeApp('parkingfury-window')">□</button><button class="win-btn close-btn" onclick="closeApp('parkingfury-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/parkingfury.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="granny3-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="granny3-window-header"><span class="window-title">👵 Granny 3</span><div><button class="win-btn" onclick="minimizeApp('granny3-window')">−</button><button class="win-btn" onclick="maximizeApp('granny3-window')">□</button><button class="win-btn close-btn" onclick="closeApp('granny3-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/granny3.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
@@ -606,8 +604,8 @@ id="ps-game-list" style="flex: 1; overflow-y: auto; display: flex; flex-directio
         <div class="window" id="effingzombies-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="effingzombies-window-header"><span class="window-title">🧟 Effing Zombies</span><div><button class="win-btn" onclick="minimizeApp('effingzombies-window')">−</button><button class="win-btn" onclick="maximizeApp('effingzombies-window')">□</button><button class="win-btn close-btn" onclick="closeApp('effingzombies-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/effing zombies.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="granny2-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="granny2-window-header"><span class="window-title">👵 Granny 2</span><div><button class="win-btn" onclick="minimizeApp('granny2-window')">−</button><button class="win-btn" onclick="maximizeApp('granny2-window')">□</button><button class="win-btn close-btn" onclick="closeApp('granny2-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/granny2.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="pokemon-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="pokemon-window-header"><span class="window-title">⚡ Pokemon</span><div><button class="win-btn" onclick="minimizeApp('pokemon-window')">−</button><button class="win-btn" onclick="maximizeApp('pokemon-window')">□</button><button class="win-btn close-btn" onclick="closeApp('pokemon-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/pokemon-wip.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="1v1lol-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="1v1lol-window-header"><span class="window-title">🔫 1v1.LOL</span><div><button class="win-btn" onclick="minimizeApp('1v1lol-window')">−</button><button class="win-btn" onclick="maximizeApp('1v1lol-window')">□</button><button class="win-btn close-btn" onclick="closeApp('1v1lol-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/1v1 LOL.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window"         <div class="window" id="bitlife-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="bitlife-window-header"><span class="window-title">📱 Bitlife</span><div><button class="win-btn" onclick="minimizeApp('bitlife-window')">−</button><button class="win-btn" onclick="maximizeApp('bitlife-window')">□</button><button class="win-btn close-btn" onclick="closeApp('bitlife-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/bitlife.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
+        <div class="window" id="1v1lol-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="1v1lol-window-header"><span class="window-title">🔫 1v1.LOL</span><div><button class="win-btn" onclick="minimizeApp('1v1lol-window')">−</button><button class="win-btn" onclick="maximizeApp('1v1lol-window')">□</button><button class="win-btn close-btn" onclick="closeApp('1v1lol-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/1v1 LOL.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div>
+        <div class="window" id="bitlife-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="bitlife-window-header"><span class="window-title">📱 Bitlife</span><div><button class="win-btn" onclick="minimizeApp('bitlife-window')">−</button><button class="win-btn" onclick="maximizeApp('bitlife-window')">□</button><button class="win-btn close-btn" onclick="closeApp('bitlife-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/bitlife.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="footballbros-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="footballbros-window-header"><span class="window-title">🏈 Football Bros</span><div><button class="win-btn" onclick="minimizeApp('footballbros-window')">−</button><button class="win-btn" onclick="maximizeApp('footballbros-window')">□</button><button class="win-btn close-btn" onclick="closeApp('footballbros-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/football-bros.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
 <div class="window" id="linkcreator-window" style="display: none; width: 600px; height: 500px;">
             <div class="window-header" id="linkcreator-window-header">
@@ -645,6 +643,7 @@ id="ps-game-list" style="flex: 1; overflow-y: auto; display: flex; flex-directio
             <div style="font-size: 11px; font-weight: 600; color: var(--sys-primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding: 0 10px;">Continue where you left off</div>
             <div class="launcher-grid" id="launcher-recent-list" style="display: flex; flex-direction: row; gap: 15px; padding: 0 10px; overflow-x: auto;"></div>
         </div>
+    </div>
         <div class="launcher-grid" id="launcher-list">
             <div class="launcher-item" data-app-id="chrome-window" data-icon="🌐" data-name="Chrome" onclick="openApp('chrome-window')"><div class="l-icon">🌐</div><span class="l-text">Chrome</span></div>
             <div class="launcher-item" data-app-id="store-window" data-icon="🛍️" data-name="Play Store" onclick="openApp('store-window')"><div class="l-icon">🛍️</div><span class="l-text">Play Store</span></div>
@@ -656,10 +655,9 @@ id="ps-game-list" style="flex: 1; overflow-y: auto; display: flex; flex-directio
             <div class="launcher-item" data-app-id="linkcreator-window" data-icon="🔗" data-name="Link Creator" onclick="openApp('linkcreator-window')"><div class="l-icon">🔗</div><span class="l-text">Link Creator</span></div>
             <div class="launcher-item" data-app-id="granny2-window" data-icon="👵" data-name="Granny 2" onclick="openApp('granny2-window')"><div class="l-icon">👵</div><span class="l-text">Granny 2</span></div>
             <div class="launcher-item" data-app-id="pokemon-window" data-icon="⚡" data-name="Pokemon" onclick="openApp('pokemon-window')"><div class="l-icon">⚡</div><span class="l-text">Pokemon</span></div>
-            <div class="launcher-item" data-app-id="1v1lol-window" data-icon="🔫" data-name="1v1.LOL" onclick="openApp('1v1lol-window')"><div class="l-icon">🔫</div>
+            <div class="launcher-item" data-app-id="1v1lol-window" data-icon="🔫" data-name="1v1.LOL" onclick="openApp('1v1lol-window')"><div class="l-icon">🔫</div><span class="l-text">1v1.LOL</span></div>
             <div class="launcher-item" data-app-id="bitlife-window" data-icon="📱" data-name="Bitlife" onclick="openApp('bitlife-window')"><div class="l-icon">📱</div><span class="l-text">Bitlife</span></div>
             <div class="launcher-item" data-app-id="footballbros-window" data-icon="🏈" data-name="Football Bros" onclick="openApp('footballbros-window')"><div class="l-icon">🏈</div><span class="l-text">Football Bros</span></div>
-<span class="l-text">1v1.LOL</span></div>
         </div>
     </div>
 
