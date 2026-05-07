@@ -1229,37 +1229,72 @@ function formatPlayTime(seconds) {
 
 // Render sidebar game list
 function renderPlayStoreSidebar() {
-    const list = document.getElementById('ps-game-list');
-    if (!list) return;
+    const gameList = document.getElementById('ps-game-list');
+    const appList = document.getElementById('ps-app-list');
+    if (!gameList) return;
 
     const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
     const installedIds = installed.map(a => a.id);
     const recent = getRecentPlays();
 
-    let html = '';
+    // Render games
+    let gamesHtml = '';
+    Object.values(PS_GAMES).forEach(game => {
+        const isInstalled = installedIds.includes(game.id);
+        const isActive = recent.length > 0 && recent[0] === game.id;
+        gamesHtml += `<div class="ps-game-item ${isActive ? 'active' : ''}" onclick="openPlayStoreDetail('${game.id}', 'game')">
+            <div class="ps-game-icon">${game.icon}</div>
+            <span>${game.name} ${isInstalled ? '✓' : ''}</span>
+        </div>`;
+    });
+    gameList.innerHTML = gamesHtml;
 
-    if (psCurrentCategory === 'games') {
-        // Show ALL games in sidebar (browseable without install)
-        Object.values(PS_GAMES).forEach(game => {
-            const isInstalled = installedIds.includes(game.id);
-            const isActive = recent.length > 0 && recent[0] === game.id;
-            html += `<div class="ps-game-item ${isActive ? 'active' : ''}" onclick="openPlayStoreDetail('${game.id}', 'game')">
-                <div class="ps-game-icon">${game.icon}</div>
-                <span>${game.name} ${isInstalled ? '✓' : ''}</span>
-            </div>`;
-        });
-    } else {
-        // Show ALL apps in sidebar
+    // Render apps
+    if (appList) {
+        let appsHtml = '';
         Object.values(PS_APPS).forEach(app => {
             const isInstalled = installedIds.includes(app.id);
-            html += `<div class="ps-game-item" onclick="openPlayStoreDetail('${app.id}', 'app')">
+            appsHtml += `<div class="ps-game-item" onclick="openPlayStoreDetail('${app.id}', 'app')">
                 <div class="ps-game-icon">${app.icon}</div>
                 <span>${app.name} ${isInstalled ? '✓' : ''}</span>
             </div>`;
         });
+        appList.innerHTML = appsHtml;
     }
+}
 
-    list.innerHTML = html;
+let psSidebarCategory = 'games';
+
+function switchSidebarCategory(category) {
+    psSidebarCategory = category;
+    const gameList = document.getElementById('ps-game-list');
+    const appList = document.getElementById('ps-app-list');
+    const gamesBtn = document.getElementById('ps-sidebar-games-btn');
+    const appsBtn = document.getElementById('ps-sidebar-apps-btn');
+
+    if (category === 'games') {
+        if (gameList) gameList.style.display = 'flex';
+        if (appList) appList.style.display = 'none';
+        if (gamesBtn) {
+            gamesBtn.style.background = 'var(--ps-primary)';
+            gamesBtn.style.color = 'white';
+        }
+        if (appsBtn) {
+            appsBtn.style.background = 'rgba(255,255,255,0.05)';
+            appsBtn.style.color = '#9aa0a6';
+        }
+    } else {
+        if (gameList) gameList.style.display = 'none';
+        if (appList) appList.style.display = 'flex';
+        if (gamesBtn) {
+            gamesBtn.style.background = 'rgba(255,255,255,0.05)';
+            gamesBtn.style.color = '#9aa0a6';
+        }
+        if (appsBtn) {
+            appsBtn.style.background = 'var(--ps-primary)';
+            appsBtn.style.color = 'white';
+        }
+    }
 }
 
 // Select a game in the sidebar
