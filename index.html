@@ -3,13 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">Aura OS - Ultimate Edition</title>
+    <title id="page-title">Echo OS</title>
     <link rel="stylesheet" href="style.css">
     <link id="page-favicon" rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==">
     <base target="_blank">
 <base target="_blank">
 </head>
 <body data-theme="dark">
+    <div id="dev-banner" style="position: fixed; top: 0; left: 0; width: 100%; background: #ea4335; color: white; text-align: center; padding: 12px 20px; font-size: 14px; font-weight: 500; z-index: 999999; font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif; box-shadow: 0 2px 10px rgba(234,67,53,0.3);">
+    ⚠️ The website is currently going under huge development. We are fixing games and changing the name of our website soon.
+</div>
+<style>
+    #dev-banner { animation: bannerPulse 3s infinite ease-in-out; }
+    @keyframes bannerPulse {
+        0%, 100% { background: #ea4335; }
+        50% { background: #d33426; }
+    }
+    /* Push content down to account for banner */
+    #boot-screen { margin-top: 44px; }
+    #account-loading-screen { margin-top: 44px; }
+    #account-modal { margin-top: 44px; }
+    #welcome-modal { margin-top: 44px; }
+    #setup-screen { margin-top: 44px; }
+    #lock-screen { margin-top: 44px; }
+    #desktop { margin-top: 44px; height: calc(100vh - 44px); }
+    #aboutblank-modal { margin-top: 44px; }
+    #update-modal { margin-top: 44px; }
+    #calendar-modal { margin-top: 44px; }
+</style>
     <div id="boot-screen">
         <div class="boot-logo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 64px; height: 64px; color: #8ab4f8;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>
@@ -22,7 +43,7 @@
         <div class="account-loading-container">
             <div class="account-loading-avatar" id="loading-avatar">👤</div>
             <div class="account-loading-email" id="loading-email"></div>
-            <div class="account-loading-status">Loading your data...</div>
+            <div class="account-loading-status">Loading your Echo OS data...</div>
             <div class="account-loading-bar">
                 <div class="account-loading-progress" id="loading-progress"></div>
             </div>
@@ -48,16 +69,16 @@
     <!-- Update V1.8 Modal -->
     <div id="update-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100000; justify-content: center; align-items: center;">
         <div class="update-box" style="background: var(--sys-surface); border-radius: var(--radius-lg); padding: 30px; width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--sys-border);">
-            <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Update V2.0 is Here! <span style="font-size:14px;color:var(--sys-text-muted)">MAY 6</span></h2>
+            <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Echo OS Development Update <span style="font-size:14px;color:var(--sys-text-muted)">MAY 6</span></h2>
             <div style="background: rgba(128,128,128,0.1); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;">
                 <h3 style="margin: 0 0 15px 0; color: var(--sys-text); font-size: 16px;">What's New:</h3>
                 <ul style="margin: 0; padding-left: 20px; color: var(--sys-text); font-size: 14px; line-height: 1.6;">
-                    <li><strong>👤 Account System</strong> - Create and manage Aura OS accounts with @auraos.com</li>
+                    <li><strong>👤 Echo Account System</strong> - Create and manage Echo OS accounts with @echoos.com</li>
                     <li><strong>🏠 Fixed Granny 3</strong> - Granny 3 now loads correctly</li>
                     <li><strong>👵 Added Granny 2</strong> - New horror game available</li>
                     <li><strong>⚡ Added Pokemon</strong> - Pokemon game now available</li>
                     <li><strong>🏎️ Fixed Smash Karts</strong> - Smash Karts now loads correctly</li>
-                    <li><strong>🎵 Aura Music Media Controller</strong> - Control music from taskbar</li>
+                    <li><strong>🎵 Echo Music Media Controller</strong> - Control music from taskbar</li>
                     <li><strong>🎤 Fixed Friday Night Funkin</strong> - FNF now loads correctly</li>
                     <li><strong>🔫 Added 1v1.LOL</strong> - New battle royale shooter available</li>
                     <li><strong>🔗 Auto Link Creator Removed</strong> - Now a button you can click instead</li>
@@ -77,13 +98,13 @@
             <div class="account-logo">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px; color: white;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>
             </div>
-            <h2>Welcome to Aura OS</h2>
-            <p class="account-subtitle">Sign in with your Aura Account</p>
+            <h2>Welcome to Echo OS</h2>
+            <p class="account-subtitle">Sign in with your Echo Account</p>
 
             <div id="account-signin-view">
                 <div class="account-input-group">
                     <label>Email</label>
-                    <input type="text" id="account-email-input" class="account-input" placeholder="username@auraos.com">
+                    <input type="text" id="account-email-input" class="account-input" placeholder="username@echoos.com">
                 </div>
                 <div class="account-input-group">
                     <label>Password</label>
@@ -105,7 +126,7 @@
                     <label>Choose Username</label>
                     <div class="account-username-wrapper">
                         <input type="text" id="create-username-input" class="account-input" placeholder="username" oninput="updateEmailPreview()">
-                        <span class="account-domain">@auraos.com</span>
+                        <span class="account-domain">@echoos.com</span>
                     </div>
                     <div class="account-email-preview" id="email-preview"></div>
                 </div>
@@ -127,10 +148,10 @@
 
     <div id="welcome-modal" style="display: none;">
         <div class="welcome-box">
-            <h2>🎉 Welcome to AURA OS!!!</h2>
-            <p>You're new to this new OS system. This OS system was created from Gemini and Eren.</p>
+            <h2>🎉 Welcome to ECHO OS!!!</h2>
+            <p>You're new to Echo OS. Echo OS is being built with care.</p>
             <p>Do whatever you like in this OS system. New features will be added soon, Check the updates in Settings..</p>
-            <p style="color: var(--sys-primary); font-size: 12px; margin-top: 15px;">Enjoy this OS. Created on Nov 21 4:52PM</p>
+            <p style="color: var(--sys-primary); font-size: 12px; margin-top: 15px;">Enjoy Echo OS. Created on Nov 21 4:52PM</p>
             <button onclick="closeWelcomeModal()">Awesome!</button>
         </div>
     </div>
@@ -139,7 +160,7 @@
         <div class="setup-card">
             <div id="setup-step-1" class="setup-step active">
                 <div class="setup-icon">👋</div>
-                <h2 class="setup-title">Welcome to Aura OS</h2>
+                <h2 class="setup-title">Welcome to Echo OS</h2>
                 <p class="setup-text">Let's get your new workspace set up. Who is going to be using this device?</p>
                 <input type="text" id="setup-name-input" class="setup-input" placeholder="Enter your full name">
                 <div class="setup-buttons">
@@ -179,8 +200,8 @@
                 <div class="lock-user-avatar">
                     <img src="https://www.gravatar.com/avatar/?d=mp&s=128" alt="User" id="lock-avatar-img">
                 </div>
-                <h2 id="lock-username" class="lock-username">User</h2>
-                <div id="lock-email" class="lock-email"></div>
+                <h2 id="echo-lock-username" class="echo-lock-username">User</h2>
+                <div id="echo-lock-email" class="echo-lock-email"></div>
                 <button class="lock-option-btn" onclick="goIntoAboutBlank()" style="margin-bottom: 20px; background: rgba(255,255,255,0.2); font-size: 12px;">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -353,7 +374,7 @@
                 <div class="settings-card">
                     <p>Change how this site appears in your browser tab:</p>
                     <select id="cloak-selector" onchange="changeTabCloak()" style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--sys-border); background: transparent; color: var(--sys-text); margin-bottom: 10px;">
-                        <option value="aura">Aura OS (Default)</option>
+                        <option value="echo">Echo OS (Default)</option>
                         <option value="fleckle">Fleckle</option>
                         <option value="classroom">Google Classroom</option>
                         <option value="flocabulary">Flocabulary</option>
@@ -387,7 +408,7 @@
                         <option value="gimkit">Gimkit</option>
                         <option value="kahoot">Kahoot!</option>
                     </select>
-                    <p id="cloak-status" style="font-size: 12px; color: var(--sys-text-muted); margin: 0;">Current: Aura OS</p>
+                    <p id="cloak-status" style="font-size: 12px; color: var(--sys-text-muted); margin: 0;">Current: Echo OS</p>
                 </div>
 
                 <h3 class="settings-title">About:Blank Cloaking</h3>
@@ -418,7 +439,7 @@
 
                 <h3 class="settings-title">System Updates</h3>
                 <div class="settings-card">
-                    <strong style="display: block; margin-bottom: 5px;">Version 2.0 MAY 6 (Latest)</strong>
+                    <strong style="display: block; margin-bottom: 5px;">Echo OS v1.0 Development Build</strong>
                     <ul style="font-size: 13px; color: var(--sys-text-muted); margin-top: 0; margin-bottom: 15px; padding-left: 20px;">
                         <li>🛍️ Upgraded The Play Store - detail modals, browse all items</li>
                         <li>🔧 Fixed the Servers - connectivity issues resolved</li>
@@ -426,8 +447,8 @@
                         <li>🏈 Added Football Bros - football sports game</li>
                         <li>⭐ Favorites Tab - save favorite games and apps</li>
                         <li>📱 Apps Category - browse apps in Store</li>
-                        <li>👤 Account System - Create and manage Aura OS accounts</li>
-                        <li>🎵 Aura Music Media Controller - control from taskbar</li>
+                        <li>👤 Echo Account System - Create and manage Echo OS accounts</li>
+                        <li>🎵 Echo Music Media Controller - control from taskbar</li>
                         <li>Continue where you left off - active apps in launcher</li>
                         <li>Battery Saver - saves data usage to file automatically</li>
                     </ul>
@@ -573,8 +594,8 @@
         <div class="window" id="fridaynightfunk-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="fridaynightfunk-window-header"><span class="window-title">🎤 Friday Night Funkin</span><div><button class="win-btn" onclick="minimizeApp('fridaynightfunk-window')">−</button><button class="win-btn" onclick="maximizeApp('fridaynightfunk-window')">□</button><button class="win-btn close-btn" onclick="closeApp('fridaynightfunk-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/FridayNightFunk.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="geometrydash-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="geometrydash-window-header"><span class="window-title">📐 Geometry Dash</span><div><button class="win-btn" onclick="minimizeApp('geometrydash-window')">−</button><button class="win-btn" onclick="maximizeApp('geometrydash-window')">□</button><button class="win-btn close-btn" onclick="closeApp('geometrydash-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Geo-Dash.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="discord-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="discord-window-header"><span class="window-title">💬 Discord</span><div><button class="win-btn" onclick="minimizeApp('discord-window')">−</button><button class="win-btn" onclick="maximizeApp('discord-window')">□</button><button class="win-btn close-btn" onclick="closeApp('discord-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/Discord.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="auraflix-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="auraflix-window-header"><span class="window-title">🎬 AuraFlix</span><div><button class="win-btn" onclick="minimizeApp('auraflix-window')">−</button><button class="win-btn" onclick="maximizeApp('auraflix-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auraflix-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraFlix.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="auramusic-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="auramusic-window-header"><span class="window-title">🎵 Aura Music</span><div><button class="win-btn" onclick="minimizeApp('auramusic-window')">−</button><button class="win-btn" onclick="maximizeApp('auramusic-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auramusic-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraOS Music.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
+        <div class="window" id="echoflix-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="echoflix-window-header"><span class="window-title">🎬 EchoFlix</span><div><button class="win-btn" onclick="minimizeApp('echoflix-window')">−</button><button class="win-btn" onclick="maximizeApp('echoflix-window')">□</button><button class="win-btn close-btn" onclick="closeApp('echoflix-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/EchoFlix.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
+        <div class="window" id="echomusic-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="echomusic-window-header"><span class="window-title">🎵 Echo Music</span><div><button class="win-btn" onclick="minimizeApp('echomusic-window')">−</button><button class="win-btn" onclick="maximizeApp('echomusic-window')">□</button><button class="win-btn close-btn" onclick="closeApp('echomusic-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/EchoOS Music.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="smashcarts-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="smashcarts-window-header"><span class="window-title">🏎️ Smash Carts</span><div><button class="win-btn" onclick="minimizeApp('smashcarts-window')">−</button><button class="win-btn" onclick="maximizeApp('smashcarts-window')">□</button><button class="win-btn close-btn" onclick="closeApp('smashcarts-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/smash carts.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="eaglercraft-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="eaglercraft-window-header"><span class="window-title">⛏️ Eaglercraft</span><div><button class="win-btn" onclick="minimizeApp('eaglercraft-window')">−</button><button class="win-btn" onclick="maximizeApp('eaglercraft-window')">□</button><button class="win-btn close-btn" onclick="closeApp('eaglercraft-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Eaglercraft.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="fnae-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="fnae-window-header"><span class="window-title">🐻 Five Nights</span><div><button class="win-btn" onclick="minimizeApp('fnae-window')">−</button><button class="win-btn" onclick="maximizeApp('fnae-window')">□</button><button class="win-btn close-btn" onclick="closeApp('fnae-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Five Nights at Epstein's.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
@@ -666,7 +687,7 @@
             <div class="media-modal-art" id="media-modal-art"></div>
             <div class="media-modal-info">
                 <div class="track-name" id="media-modal-track">Not Playing</div>
-                <div class="artist-name" id="media-modal-artist">Aura Music</div>
+                <div class="artist-name" id="media-modal-artist">Echo Music</div>
             </div>
         </div>
         <div class="media-progress-bar" id="media-progress-bar" onclick="seekMedia(event)">
