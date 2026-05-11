@@ -1,19 +1,19 @@
-// ===== AURA OS ACCOUNT SYSTEM =====
+// ===== ECHO OS ACCOUNT SYSTEM =====
 // All user data is stored in localStorage with account-specific prefixes
 
-const AURA_DOMAIN = '@auraos.com';
+const ECHO_DOMAIN = '@echoos.com';
 let currentAccount = null; // { email, username, name, password }
 
 // Initialize account database
 function initAccountDB() {
-    if (!localStorage.getItem('aura_accounts_db')) {
-        localStorage.setItem('aura_accounts_db', JSON.stringify({}));
+    if (!localStorage.getItem('echo_accounts_db')) {
+        localStorage.setItem('echo_accounts_db', JSON.stringify({}));
     }
 }
 
 // Get all accounts from database
 function getAllAccounts() {
-    const db = localStorage.getItem('aura_accounts_db');
+    const db = localStorage.getItem('echo_accounts_db');
     return db ? JSON.parse(db) : {};
 }
 
@@ -21,7 +21,7 @@ function getAllAccounts() {
 function saveAccountToDB(account) {
     const accounts = getAllAccounts();
     accounts[account.email] = account;
-    localStorage.setItem('aura_accounts_db', JSON.stringify(accounts));
+    localStorage.setItem('echo_accounts_db', JSON.stringify(accounts));
 }
 
 // Get account by email
@@ -34,14 +34,14 @@ function getAccountByEmail(email) {
 function deleteAccountFromDB(email) {
     const accounts = getAllAccounts();
     delete accounts[email];
-    localStorage.setItem('aura_accounts_db', JSON.stringify(accounts));
+    localStorage.setItem('echo_accounts_db', JSON.stringify(accounts));
     // Also clear all account-specific data
     clearAccountData(email);
 }
 
 // Get account-specific storage key prefix
 function getAccountPrefix(email) {
-    return 'aura_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '') + '_';
+    return 'echo_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '') + '_';
 }
 
 // Save data for current account
@@ -105,7 +105,7 @@ function updateEmailPreview() {
     const username = document.getElementById('create-username-input').value.trim();
     const preview = document.getElementById('email-preview');
     if (username) {
-        preview.innerText = 'Your email will be: ' + username + AURA_DOMAIN;
+        preview.innerText = 'Your email will be: ' + username + ECHO_DOMAIN;
     } else {
         preview.innerText = '';
     }
@@ -144,7 +144,7 @@ function createAccount() {
         return;
     }
 
-    const email = username + AURA_DOMAIN;
+    const email = username + ECHO_DOMAIN;
 
     // Check if account already exists
     if (getAccountByEmail(email)) {
@@ -165,7 +165,7 @@ function createAccount() {
 
     // Set as current account
     currentAccount = account;
-    localStorage.setItem('aura_current_account', email);
+    localStorage.setItem('echo_current_account', email);
 
     // Hide modal and continue setup
     hideAccountModal();
@@ -190,10 +190,10 @@ function signInAccount() {
         return;
     }
 
-    // Ensure @auraos.com suffix
+    // Ensure @echoos.com suffix
     let email = emailInput;
     if (!email.includes('@')) {
-        email = email + AURA_DOMAIN;
+        email = email + ECHO_DOMAIN;
     }
 
     const account = getAccountByEmail(email);
@@ -209,7 +209,7 @@ function signInAccount() {
 
     // Sign in successful
     currentAccount = account;
-    localStorage.setItem('aura_current_account', email);
+    localStorage.setItem('echo_current_account', email);
 
     hideAccountModal();
 
@@ -343,7 +343,7 @@ function switchToAccount(email) {
 
     // Switch to new account
     currentAccount = account;
-    localStorage.setItem('aura_current_account', email);
+    localStorage.setItem('echo_current_account', email);
 
     // Hide lock screen and show loading
     const lockScreen = document.getElementById('lock-screen');
@@ -362,7 +362,7 @@ function removeAccount(email) {
 
     if (wasCurrent) {
         currentAccount = null;
-        localStorage.removeItem('aura_current_account');
+        localStorage.removeItem('echo_current_account');
         location.reload();
     } else {
         updateLockScreenAccountsList();
@@ -382,16 +382,16 @@ function signOutAccount() {
     if (!confirm('Sign out of ' + (currentAccount ? currentAccount.email : 'your account') + '?')) return;
 
     currentAccount = null;
-    localStorage.removeItem('aura_current_account');
+    localStorage.removeItem('echo_current_account');
     location.reload();
 }
 
 // Override the original finalizeSetup to save to account
 const originalFinalizeSetup = window.finalizeSetup;
 window.finalizeSetup = function() {
-    localStorage.setItem('os_setup_complete', 'true');
-    localStorage.setItem('os_username', tempUsername);
-    if (tempPassword !== '') localStorage.setItem('os_password', tempPassword);
+    localStorage.setItem('echo_setup_complete', 'true');
+    localStorage.setItem('echo_username', tempUsername);
+    if (tempPassword !== '') localStorage.setItem('echo_password', tempPassword);
 
     // Also save to account-specific storage
     if (currentAccount) {
@@ -421,10 +421,10 @@ window.unlockOS = function() {
     if (currentAccount) {
         correctPassword = getAccountData('password') || currentAccount.password;
     } else {
-        correctPassword = localStorage.getItem('os_password');
+        correctPassword = localStorage.getItem('echo_password');
     }
 
-    const savedAnswer = currentAccount ? getAccountData('answer') : localStorage.getItem('os_answer');
+    const savedAnswer = currentAccount ? getAccountData('answer') : localStorage.getItem('echo_answer');
 
     if (input === correctPassword || input === savedAnswer) {
         if (lockScreen) lockScreen.style.display = 'none';
@@ -445,15 +445,15 @@ window.saveSecuritySettings = function() {
     const a = document.getElementById('set-answer').value;
 
     if (pass) {
-        localStorage.setItem('os_password', pass);
+        localStorage.setItem('echo_password', pass);
         if (currentAccount) saveAccountData('password', pass);
     }
     if (q) {
-        localStorage.setItem('os_question', q);
+        localStorage.setItem('echo_question', q);
         if (currentAccount) saveAccountData('question', q);
     }
     if (a) {
-        localStorage.setItem('os_answer', a);
+        localStorage.setItem('echo_answer', a);
         if (currentAccount) saveAccountData('answer', a);
     }
 
@@ -476,7 +476,7 @@ window.factoryReset = function() {
 // Override lockSystem to show account info
 const originalLockSystem = window.lockSystem;
 window.lockSystem = function() {
-    const accountPassword = currentAccount ? getAccountData('password') : localStorage.getItem('os_password');
+    const accountPassword = currentAccount ? getAccountData('password') : localStorage.getItem('echo_password');
 
     if (accountPassword) {
         updateLockScreenForAccount();
@@ -511,11 +511,11 @@ window.initializeDesktop = function() {
     }
 
     const desktop = document.getElementById('desktop');
-    const savedWallpaper = getAccountData('wallpaper') || localStorage.getItem('os_wallpaper');
+    const savedWallpaper = getAccountData('wallpaper') || localStorage.getItem('echo_wallpaper');
     if (savedWallpaper && desktop) desktop.style.backgroundImage = `url('${savedWallpaper}')`;
 
     // Load account-specific installed apps
-    const savedApps = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const savedApps = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('echo_installed_apps') || '[]');
     savedApps.forEach(app => {
         restoreAppToLauncher(app.id, app.icon, app.name);
         if (app.pinned) {
@@ -537,14 +537,14 @@ window.setWallpaper = function(url) {
     let highResUrl = url.replace("w=400", "w=2000");
     const desktop = document.getElementById('desktop');
     if (desktop) desktop.style.backgroundImage = `url('${highResUrl}')`;
-    localStorage.setItem('os_wallpaper', highResUrl);
+    localStorage.setItem('echo_wallpaper', highResUrl);
     if (currentAccount) saveAccountData('wallpaper', highResUrl);
 };
 
 // Override saveAppToStorage to save to account
 const originalSaveAppToStorage = window.saveAppToStorage;
 window.saveAppToStorage = function(appId, iconSymbol, appName) {
-    let savedApps = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    let savedApps = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('echo_installed_apps') || '[]');
     if (!savedApps.find(app => app.id === appId)) {
         savedApps.push({
             id: appId,
@@ -552,7 +552,7 @@ window.saveAppToStorage = function(appId, iconSymbol, appName) {
             name: appName,
             pinned: false
         });
-        localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
+        localStorage.setItem('echo_installed_apps', JSON.stringify(savedApps));
         if (currentAccount) saveAccountData('installed_apps', JSON.stringify(savedApps));
     }
 };
@@ -562,9 +562,9 @@ const originalNotepadSave = window.notepadSave;
 window.notepadSave = function() {
     if(!currentNotepadFile) { notepadSaveAs(); return; }
     let content = document.getElementById('wordpad-editor').innerHTML;
-    let files = JSON.parse(getAccountData('files') || localStorage.getItem('aura_files') || '{}');
+    let files = JSON.parse(getAccountData('files') || localStorage.getItem('echo_files') || '{}');
     files[currentNotepadFile] = content;
-    localStorage.setItem('aura_files', JSON.stringify(files));
+    localStorage.setItem('echo_files', JSON.stringify(files));
     if (currentAccount) saveAccountData('files', JSON.stringify(files));
     notificationMgr.showNotification({ title: "File Saved", message: `${currentNotepadFile} was saved successfully!`, icon: "sparkles" });
     renderFiles();
@@ -575,7 +575,7 @@ const originalRenderFiles = window.renderFiles;
 window.renderFiles = function() {
     const grid = document.getElementById('file-explorer-grid');
     if(!grid) return;
-    let files = JSON.parse(getAccountData('files') || localStorage.getItem('aura_files') || '{}');
+    let files = JSON.parse(getAccountData('files') || localStorage.getItem('echo_files') || '{}');
     grid.innerHTML = '';
     for(let name in files) {
         grid.innerHTML += `<div class="file-item" ondblclick="window.openFileFromExplorer('${name}')"><div class="f-icon">📄</div><span>${name}</span></div>`;
@@ -585,7 +585,7 @@ window.renderFiles = function() {
 // Override openFileFromExplorer to load from account
 const originalOpenFileFromExplorer = window.openFileFromExplorer;
 window.openFileFromExplorer = function(name) {
-    let files = JSON.parse(getAccountData('files') || localStorage.getItem('aura_files') || '{}');
+    let files = JSON.parse(getAccountData('files') || localStorage.getItem('echo_files') || '{}');
     document.getElementById('wordpad-editor').innerHTML = files[name];
     currentNotepadFile = name;
     openApp('wordpad-window');
@@ -594,10 +594,10 @@ window.openFileFromExplorer = function(name) {
 // Override saveBatteryLogToFile to save to account
 const originalSaveBatteryLogToFile = window.saveBatteryLogToFile;
 window.saveBatteryLogToFile = function() {
-    const batteryLog = localStorage.getItem('aura_battery_log') || '';
-    let files = JSON.parse(getAccountData('files') || localStorage.getItem('aura_files') || '{}');
+    const batteryLog = localStorage.getItem('echo_battery_log') || '';
+    let files = JSON.parse(getAccountData('files') || localStorage.getItem('echo_files') || '{}');
     files['battery_saver_log.txt'] = `<pre style="font-family: monospace; white-space: pre-wrap; font-size: 12px; line-height: 1.5;">${batteryLog}</pre>`;
-    localStorage.setItem('aura_files', JSON.stringify(files));
+    localStorage.setItem('echo_files', JSON.stringify(files));
     if (currentAccount) saveAccountData('files', JSON.stringify(files));
 };
 
@@ -614,7 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const desktop = document.getElementById('desktop');
                     if (desktop) desktop.style.backgroundImage = `url('${ev.target.result}')`;
                     try {
-                        localStorage.setItem('os_wallpaper', ev.target.result);
+                        localStorage.setItem('echo_wallpaper', ev.target.result);
                         if (currentAccount) saveAccountData('wallpaper', ev.target.result);
                     } catch(err) {
                         alert("Image applied for this session.");
@@ -626,17 +626,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ===== BOOT SEQUENCE WITH ACCOUNT SYSTEM =====
+// ===== ECHO OS BOOT SEQUENCE =====
 window.onload = function() {
     initAccountDB();
 
     // Check if there's a current account
-    const savedAccountEmail = localStorage.getItem('aura_current_account');
+    const savedAccountEmail = localStorage.getItem('echo_current_account');
     if (savedAccountEmail) {
         currentAccount = getAccountByEmail(savedAccountEmail);
     }
 
-    if(localStorage.getItem('os_theme') === 'light') {
+    if(localStorage.getItem('echo_theme') === 'light') {
         document.body.setAttribute('data-theme', 'light');
         const themeText = document.getElementById('theme-text');
         if (themeText) themeText.innerText = "Light Theme";
@@ -652,7 +652,7 @@ window.onload = function() {
         // Check if user has an account system account
         const accounts = getAllAccounts();
         const hasAccounts = Object.keys(accounts).length > 0;
-        const isSetupComplete = localStorage.getItem('os_setup_complete');
+        const isSetupComplete = localStorage.getItem('echo_setup_complete');
 
         if (currentAccount) {
             // Signed into an account - show account loading screen
@@ -666,9 +666,9 @@ window.onload = function() {
         } else {
             // Legacy: no accounts, but setup was completed before account system existed
             initializeDesktop();
-            if (localStorage.getItem('os_password')) {
+            if (localStorage.getItem('echo_password')) {
                 const lockUsername = document.getElementById('lock-username');
-                if (lockUsername) lockUsername.innerText = localStorage.getItem('os_username') || 'User';
+                if (lockUsername) lockUsername.innerText = localStorage.getItem('echo_username') || 'User';
                 const lockScreen = document.getElementById('lock-screen');
                 if (lockScreen) lockScreen.style.display = 'flex';
             } else {
@@ -679,7 +679,7 @@ window.onload = function() {
     }, 2500);
 };
 
-// ===== ORIGINAL FUNCTIONS (preserved) =====
+// ===== ECHO OS CORE FUNCTIONS =====
 
 
 // --- CORS PROXY CONFIGURATION FOR CHROME ---
@@ -690,7 +690,7 @@ const CORS_PROXIES = {
     none: ''
 };
 
-let currentProxy = localStorage.getItem('chrome_proxy') || 'corsproxy';
+let currentProxy = localStorage.getItem('echo_chrome_proxy') || 'corsproxy';
 let chromeHistory = [], chromeIndex = -1;
 
 function getProxiedUrl(url) {
@@ -707,7 +707,7 @@ function toggleProxySettings() {
 function changeProxy() {
     const selector = document.getElementById('proxy-selector');
     currentProxy = selector.value;
-    localStorage.setItem('chrome_proxy', currentProxy);
+    localStorage.setItem('echo_chrome_proxy', currentProxy);
 
     const status = document.getElementById('proxy-status');
     status.innerText = currentProxy === 'none' ? 'Disabled' : 'Active';
@@ -848,8 +848,8 @@ function initChromeProxy() {
 
 // --- TAB CLOAKING SYSTEM ---
 const CLOAK_PRESETS = {
-    aura: {
-        title: 'Aura OS - Ultimate Edition',
+    echo: {
+        title: 'Echo OS - Ultimate Edition',
         favicon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
     },
     fleckle: {
@@ -873,14 +873,14 @@ function changeTabCloak() {
     if (preset) {
         document.getElementById('page-title').innerText = preset.title;
         document.getElementById('page-favicon').href = preset.favicon;
-        localStorage.setItem('tab_cloak', selector.value);
+        localStorage.setItem('echo_tab_cloak', selector.value);
 
         document.getElementById('cloak-status').innerText = 'Current: ' + preset.title;
     }
 }
 
 function initTabCloak() {
-    const savedCloak = localStorage.getItem('tab_cloak') || 'aura';
+    const savedCloak = localStorage.getItem('echo_tab_cloak') || 'echo';
     const selector = document.getElementById('cloak-selector');
     if (selector) {
         selector.value = savedCloak;
@@ -890,7 +890,7 @@ function initTabCloak() {
 
 // --- INSTANT ABOUT:BLANK CLOAKING - EXECUTE IMMEDIATELY ---
 (function checkInstantAboutBlank() {
-    const setting = localStorage.getItem('aboutblank_setting');
+    const setting = localStorage.getItem('echo_aboutblank_setting');
     if (setting === 'always') {
         // Prevent multiple about:blank tabs - check if we're already in an iframe
         if (window.self !== window.top) {
@@ -899,10 +899,10 @@ function initTabCloak() {
         }
 
         // Check if we've already opened about:blank in this session
-        if (sessionStorage.getItem('aboutblank_opened')) {
+        if (sessionStorage.getItem('echo_aboutblank_opened')) {
             return;
         }
-        sessionStorage.setItem('aboutblank_opened', 'true');
+        sessionStorage.setItem('echo_aboutblank_opened', 'true');
 
         const currentUrl = window.location.href;
         const newWindow = window.open('about:blank', '_blank');
@@ -912,7 +912,7 @@ function initTabCloak() {
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Aura OS</title>
+                    <title>Echo OS</title>
                     <style>
                         body { margin: 0; overflow: hidden; }
                         iframe { width: 100vw; height: 100vh; border: none; }
@@ -937,10 +937,10 @@ function goIntoAboutBlank() {
         return;
     }
 
-    if (sessionStorage.getItem('aboutblank_opened')) {
+    if (sessionStorage.getItem('echo_aboutblank_opened')) {
         return;
     }
-    sessionStorage.setItem('aboutblank_opened', 'true');
+    sessionStorage.setItem('echo_aboutblank_opened', 'true');
 
     const currentUrl = window.location.href;
     const newWindow = window.open('about:blank', '_blank');
@@ -950,7 +950,7 @@ function goIntoAboutBlank() {
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Aura OS</title>
+                <title>Echo OS</title>
                 <style>
                     body { margin: 0; overflow: hidden; }
                     iframe { width: 100vw; height: 100vh; border: none; }
@@ -982,7 +982,7 @@ function handleAboutBlank(choice) {
 
     switch(choice) {
         case 'always':
-            localStorage.setItem('aboutblank_setting', 'always');
+            localStorage.setItem('echo_aboutblank_setting', 'always');
             openInAboutBlank();
             break;
         case 'once':
@@ -993,7 +993,7 @@ function handleAboutBlank(choice) {
             // Just close modal, don't do anything
             break;
         case 'block':
-            localStorage.setItem('aboutblank_setting', 'block');
+            localStorage.setItem('echo_aboutblank_setting', 'block');
             showBlockMessage();
             break;
     }
@@ -1005,10 +1005,10 @@ function openInAboutBlank() {
         return;
     }
 
-    if (sessionStorage.getItem('aboutblank_opened')) {
+    if (sessionStorage.getItem('echo_aboutblank_opened')) {
         return;
     }
-    sessionStorage.setItem('aboutblank_opened', 'true');
+    sessionStorage.setItem('echo_aboutblank_opened', 'true');
 
     const currentUrl = window.location.href;
     const newWindow = window.open('about:blank', '_blank');
@@ -1018,7 +1018,7 @@ function openInAboutBlank() {
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Aura OS</title>
+                <title>Echo OS</title>
                 <style>
                     body { margin: 0; overflow: hidden; }
                     iframe { width: 100vw; height: 100vh; border: none; }
@@ -1045,7 +1045,7 @@ function showBlockMessage() {
 }
 
 function checkAboutBlankSetting() {
-    const setting = localStorage.getItem('aboutblank_setting');
+    const setting = localStorage.getItem('echo_aboutblank_setting');
 
     if (setting === 'block') {
         return; // Don't show anything
@@ -1068,7 +1068,7 @@ function checkAboutBlankSetting() {
 
 function saveAboutBlankSetting() {
     const selector = document.getElementById('aboutblank-setting');
-    localStorage.setItem('aboutblank_setting', selector.value);
+    localStorage.setItem('echo_aboutblank_setting', selector.value);
 
     const blockedMsg = document.getElementById('aboutblank-blocked-msg');
     if (selector.value === 'block') {
@@ -1081,7 +1081,7 @@ function saveAboutBlankSetting() {
 function initAboutBlankSettings() {
     const selector = document.getElementById('aboutblank-setting');
     if (selector) {
-        const saved = localStorage.getItem('aboutblank_setting') || 'ask';
+        const saved = localStorage.getItem('echo_aboutblank_setting') || 'ask';
         selector.value = saved;
 
         const blockedMsg = document.getElementById('aboutblank-blocked-msg');
@@ -1093,7 +1093,7 @@ function initAboutBlankSettings() {
 
 
 
-// ===== PLAY STORE V2 SYSTEM =====
+// ===== ECHO OS PLAY STORE SYSTEM =====
 // Game database with metadata
 const PS_GAMES = {
     'doodlejump-window': { id: 'doodlejump-window', name: 'Doodle Jump', icon: '🐰', category: 'arcade', rating: 4.6, banner: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=800', desc: 'Jump endlessly upward in this classic arcade game.', controls: 'Arrow keys to move left/right' },
@@ -1140,12 +1140,12 @@ const PS_GAMES = {
 const PS_APPS = {
     'chrome-window': { id: 'chrome-window', name: 'Chrome', icon: '🌐', category: 'browser', rating: 4.9, banner: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=800', desc: 'Fast, secure web browser with built-in proxy support.', controls: 'Mouse and keyboard' },
     'discord-window': { id: 'discord-window', name: 'Discord', icon: '💬', category: 'social', rating: 4.8, banner: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=800', desc: 'Chat and connect with friends and communities.', controls: 'Mouse and keyboard' },
-    'auraflix-window': { id: 'auraflix-window', name: 'AuraFlix', icon: '🎬', category: 'entertainment', rating: 4.7, banner: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=800', desc: 'Stream movies and shows on AuraFlix.', controls: 'Mouse and keyboard' },
-    'auramusic-window': { id: 'auramusic-window', name: 'Aura Music', icon: '🎵', category: 'entertainment', rating: 4.8, banner: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800', desc: 'Stream music from Spotify and SoundCloud.', controls: 'Mouse and keyboard' },
+    'echoflix-window': { id: 'echoflix-window', name: 'EchoFlix', icon: '🎬', category: 'entertainment', rating: 4.7, banner: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=800', desc: 'Stream movies and shows on EchoFlix.', controls: 'Mouse and keyboard' },
+    'echomusic-window': { id: 'echomusic-window', name: 'Echo Music', icon: '🎵', category: 'entertainment', rating: 4.8, banner: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800', desc: 'Stream music from Spotify and SoundCloud.', controls: 'Mouse and keyboard' },
     'files-window': { id: 'files-window', name: 'Files', icon: '📁', category: 'productivity', rating: 4.5, banner: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800', desc: 'Manage your local files and documents.', controls: 'Mouse and keyboard' },
     'wordpad-window': { id: 'wordpad-window', name: 'Wordpad', icon: '📝', category: 'productivity', rating: 4.4, banner: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=800', desc: 'Create and edit text documents with rich formatting.', controls: 'Mouse and keyboard' },
     'calc-window': { id: 'calc-window', name: 'Calculator', icon: '🧮', category: 'productivity', rating: 4.6, banner: 'https://images.unsplash.com/photo-1587145820266-a5951eebe0e3?q=80&w=800', desc: 'Standard calculator for quick math.', controls: 'Mouse and keyboard' },
-    'settings-window': { id: 'settings-window', name: 'Settings', icon: '⚙️', category: 'system', rating: 5.0, banner: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=800', desc: 'Configure your Aura OS experience.', controls: 'Mouse and keyboard' },
+    'settings-window': { id: 'settings-window', name: 'Settings', icon: '⚙️', category: 'system', rating: 5.0, banner: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=800', desc: 'Configure your Echo OS experience.', controls: 'Mouse and keyboard' },
     'robloxanimator-window': { id: 'robloxanimator-window', name: 'Roblox Animator', icon: '🎬', category: 'creative', rating: 4.5, banner: 'https://images.unsplash.com/photo-1616499370260-485b3e5ed653?q=80&w=800', desc: 'Create Roblox animations.', controls: 'Mouse and keyboard' },
     'linkcreator-window': { id: 'linkcreator-window', name: 'Link Creator', icon: '🔗', category: 'productivity', rating: 4.3, banner: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=800', desc: 'Create and share custom links.', controls: 'Mouse and keyboard' }
 };
@@ -1233,7 +1233,7 @@ function renderPlayStoreSidebar() {
     const appList = document.getElementById('ps-app-list');
     if (!gameList) return;
 
-    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('echo_installed_apps') || '[]');
     const installedIds = installed.map(a => a.id);
     const recent = getRecentPlays();
 
@@ -1391,7 +1391,7 @@ function renderPlayStoreLibrary() {
     const empty = document.getElementById('ps-library-empty');
     if (!grid) return;
 
-    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('echo_installed_apps') || '[]');
     const playTimeData = getPlayTimeData();
 
     if (installed.length === 0) {
@@ -1423,7 +1423,7 @@ function renderPlayStoreStore() {
     const appsEmpty = document.getElementById('ps-apps-store-empty');
     if (!gamesGrid) return;
 
-    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('echo_installed_apps') || '[]');
     const installedIds = installed.map(a => a.id);
 
     // Render games in games grid
@@ -1518,9 +1518,9 @@ function uninstallPlayStoreGame(appId) {
     });
 
     // Update storage
-    let savedApps = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    let savedApps = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('echo_installed_apps') || '[]');
     savedApps = savedApps.filter(app => app.id !== appId);
-    localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
+    localStorage.setItem('echo_installed_apps', JSON.stringify(savedApps));
     if (currentAccount) saveAccountData('installed_apps', JSON.stringify(savedApps));
 
     notificationMgr.showNotification({ title: "Uninstalled", message: `${game.name} has been removed.`, icon: "sparkles" });
@@ -1552,7 +1552,7 @@ function renderPlayStoreFavorites() {
     if (!grid) return;
 
     const favs = getFavorites();
-    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('echo_installed_apps') || '[]');
     const installedIds = installed.map(a => a.id);
 
     if (favs.length === 0) {
@@ -1703,7 +1703,7 @@ openApp = function(appId) {
             if (usernameEl && currentAccount) {
                 usernameEl.innerText = currentAccount.name || currentAccount.username;
             } else if (usernameEl) {
-                usernameEl.innerText = localStorage.getItem('os_username') || 'User';
+                usernameEl.innerText = localStorage.getItem('echo_username') || 'User';
             }
 
             renderPlayStoreSidebar();
@@ -1714,7 +1714,7 @@ openApp = function(appId) {
     return result;
 };
 
-// ===== PLAY STORE V2.0 CATEGORY & DETAIL SYSTEM =====
+// ===== ECHO OS PLAY STORE CATEGORIES =====
 
 let psCurrentCategory = 'games';
 
@@ -1748,7 +1748,7 @@ function renderPlayStoreApps() {
     const grid = document.getElementById('ps-apps-grid');
     if (!grid) return;
 
-    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('echo_installed_apps') || '[]');
     const installedIds = installed.map(a => a.id);
 
     let html = '';
@@ -1773,7 +1773,7 @@ function openPlayStoreDetail(itemId, type) {
     const item = isGame ? PS_GAMES[itemId] : PS_APPS[itemId];
     if (!item) return;
 
-    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('echo_installed_apps') || '[]');
     const isInstalled = installed.find(a => a.id === itemId);
 
     // Get playtime data
@@ -1869,7 +1869,7 @@ renderPlayStoreStore = function() {
     const grid = document.getElementById('ps-store-grid');
     if (!grid) return;
 
-    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('echo_installed_apps') || '[]');
     const installedIds = installed.map(a => a.id);
 
     let html = '';
@@ -1932,7 +1932,7 @@ renderPlayStoreLibrary = function() {
     const empty = document.getElementById('ps-library-empty');
     if (!grid) return;
 
-    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('echo_installed_apps') || '[]');
     const playTimeData = getPlayTimeData();
 
     if (installed.length === 0) {
@@ -1959,9 +1959,9 @@ renderPlayStoreLibrary = function() {
     }).join('');
 };
 
-// ===== SERVER WARNING BANNER =====
+// ===== ECHO OS SERVER WARNING =====
 function initServerWarningBanner() {
-    if (sessionStorage.getItem('server_warning_shown')) return;
+    if (sessionStorage.getItem('echo_server_warning_shown')) return;
 
     const banner = document.getElementById('server-warning-banner');
     if (!banner) return;
@@ -1976,11 +1976,11 @@ function initServerWarningBanner() {
         setTimeout(() => {
             banner.style.display = 'none';
         }, 1000);
-        sessionStorage.setItem('server_warning_shown', 'true');
+        sessionStorage.setItem('echo_server_warning_shown', 'true');
     }, 10000);
 }
 
-// ===== UPDATE MODAL V2.0 =====
+// ===== ECHO OS UPDATE MODAL =====
 const originalShowUpdateModal = showUpdateModal;
 showUpdateModal = function() {
     const modal = document.getElementById('update-modal');
@@ -1988,7 +1988,7 @@ showUpdateModal = function() {
 
     modal.style.display = 'flex';
 
-    const hasSeenModal = localStorage.getItem('update_v20_seen');
+    const hasSeenModal = localStorage.getItem('echo_update_seen');
     const continueBtn = document.getElementById('update-continue-btn');
 
     if (hasSeenModal) {
@@ -2011,14 +2011,14 @@ showUpdateModal = function() {
                 continueBtn.innerText = 'Continue';
                 continueBtn.disabled = false;
                 continueBtn.classList.add('active');
-                localStorage.setItem('update_v20_seen', 'true');
+                localStorage.setItem('echo_update_seen', 'true');
             }
         }, 1000);
     }
 };
 
 
-// ===== END PLAY STORE V2 =====
+// ===== END ECHO OS PLAY STORE =====
 
 // --- 1. Notification System ---
 const notificationMgr = {
@@ -2061,13 +2061,13 @@ function checkEmptyNotifs() {
 }
 
 function triggerInitialNotifications() {
-    if (sessionStorage.getItem('notifs_shown')) return;
-    sessionStorage.setItem('notifs_shown', 'true');
+    if (sessionStorage.getItem('echo_notifs_shown')) return;
+    sessionStorage.setItem('echo_notifs_shown', 'true');
 
     setTimeout(() => {
         notificationMgr.showNotification({
             title: "System Announcement",
-            message: `Safety is coming to Aura OS. You will be flagged if you use swear words or nasty usernames. Coming on March 10th 2026.`,
+            message: `Safety is coming to Echo OS. You will be flagged if you use swear words or nasty usernames. Coming on March 10th 2026.`,
             icon: "shield-alert"
         });
     }, 2500);
@@ -2082,7 +2082,7 @@ function showUpdateModal() {
 
 
     // Check if user has seen this modal before
-    const hasSeenModal = localStorage.getItem('update_v18_seen');
+    const hasSeenModal = localStorage.getItem('echo_update_seen');
     const continueBtn = document.getElementById('update-continue-btn');
 
     if (hasSeenModal) {
@@ -2107,7 +2107,7 @@ function showUpdateModal() {
                 continueBtn.innerText = 'Continue';
                 continueBtn.disabled = false;
                 continueBtn.classList.add('active');
-                localStorage.setItem('update_v18_seen', 'true');
+                localStorage.setItem('echo_update_seen', 'true');
             }
         }, 1000);
     }
@@ -2438,7 +2438,7 @@ function trackActiveApps() {
             const iconMap = {
                 'chrome-window': '🌐', 'store-window': '🛍️', 'settings-window': '⚙️',
                 'wordpad-window': '📝', 'calc-window': '🧮', 'files-window': '📁',
-                'discord-window': '💬', 'auraflix-window': '🎬', 'auramusic-window': '🎵',
+                'discord-window': '💬', 'echoflix-window': '🎬', 'echomusic-window': '🎵',
                 'infinitecraft-window': '⚗️', 'paperio-window': '📄', 'parkingfury-window': '🅿️',
                 'granny3-window': '👵', 'fridaynightfunk-window': '🎤', 'geometrydash-window': '📐',
                 'smashcarts-window': '🏎️', 'fnae-window': '🐻', 'eaglercraft-window': '⛏️',
@@ -2458,7 +2458,7 @@ function trackActiveApps() {
             activeWindows.push({ id: appId, name: name, icon: iconMap[appId] || '📦' });
         }
     });
-    sessionStorage.setItem('aura_active_apps', JSON.stringify(activeWindows));
+    sessionStorage.setItem('echo_active_apps', JSON.stringify(activeWindows));
 }
 
 function restoreActiveApps() {
@@ -2466,7 +2466,7 @@ function restoreActiveApps() {
     const recentList = document.getElementById('launcher-recent-list');
     if (!recentContainer || !recentList) return;
 
-    const saved = sessionStorage.getItem('aura_active_apps');
+    const saved = sessionStorage.getItem('echo_active_apps');
     if (!saved || saved === '[]') {
         recentContainer.style.display = 'none';
         return;
@@ -2516,11 +2516,11 @@ minimizeApp = function(appId) {
 
 
 // --- Battery Saver ---
-let batterySaverEnabled = localStorage.getItem('aura_battery_saver') === 'true';
+let batterySaverEnabled = localStorage.getItem('echo_battery_saver') === 'true';
 
 function toggleBatterySaver() {
     batterySaverEnabled = !batterySaverEnabled;
-    localStorage.setItem('aura_battery_saver', batterySaverEnabled);
+    localStorage.setItem('echo_battery_saver', batterySaverEnabled);
 
     const btn = document.getElementById('battery-saver-btn');
     if (btn) {
@@ -2558,9 +2558,9 @@ function activateBatterySaver() {
     const timestamp = new Date().toISOString();
     const logEntry = `[Battery Saver Activated] ${timestamp}
 `;
-    let batteryLog = localStorage.getItem('aura_battery_log') || '';
+    let batteryLog = localStorage.getItem('echo_battery_log') || '';
     batteryLog = logEntry + batteryLog;
-    localStorage.setItem('aura_battery_log', batteryLog);
+    localStorage.setItem('echo_battery_log', batteryLog);
 
     saveBatteryLogToFile();
 }
@@ -2572,10 +2572,10 @@ function deactivateBatterySaver() {
 }
 
 function saveBatteryLogToFile() {
-    const batteryLog = localStorage.getItem('aura_battery_log') || '';
-    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
+    const batteryLog = localStorage.getItem('echo_battery_log') || '';
+    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
     files['battery_saver_log.txt'] = `<pre style="font-family: monospace; white-space: pre-wrap; font-size: 12px; line-height: 1.5;">${batteryLog}</pre>`;
-    localStorage.setItem('aura_files', JSON.stringify(files));
+    localStorage.setItem('echo_files', JSON.stringify(files));
 }
 
 function initBatterySaver() {
@@ -2597,7 +2597,7 @@ function generateLink() {
     const outputInput = document.getElementById('lc-output');
 
     let url = urlInput.value.trim();
-    const title = titleInput.value.trim() || 'Aura Link';
+    const title = titleInput.value.trim() || 'Echo Link';
 
     if (!url) {
         notificationMgr.showNotification({
@@ -2633,17 +2633,17 @@ function copyLink() {
 }
 
 function saveLinkToHistory(url, title, generated) {
-    let history = JSON.parse(localStorage.getItem('aura_link_history') || '[]');
+    let history = JSON.parse(localStorage.getItem('echo_link_history') || '[]');
     history.unshift({ url, title, generated, date: new Date().toLocaleString() });
     history = history.slice(0, 10);
-    localStorage.setItem('aura_link_history', JSON.stringify(history));
+    localStorage.setItem('echo_link_history', JSON.stringify(history));
     renderLinkHistory();
 }
 
 function renderLinkHistory() {
     const list = document.getElementById('lc-history-list');
     if (!list) return;
-    const history = JSON.parse(localStorage.getItem('aura_link_history') || '[]');
+    const history = JSON.parse(localStorage.getItem('echo_link_history') || '[]');
     list.innerHTML = '';
     history.forEach(item => {
         const entry = document.createElement('div');
@@ -2663,7 +2663,7 @@ function initLinkCreator() {
 let mediaState = {
     isPlaying: false,
     track: 'Not Playing',
-    artist: 'Aura Music',
+    artist: 'Echo Music',
     artwork: '',
     currentTime: 0,
     duration: 0,
@@ -2673,14 +2673,14 @@ let mediaState = {
 let mediaModalOpen = false;
 let mediaUpdateInterval = null;
 
-// Listen for messages from Aura Music iframe
+// Listen for messages from Echo Music iframe
 window.addEventListener('message', function(event) {
-    // Accept messages from any origin (since Aura Music is local)
-    if (event.data && event.data.type === 'aura-music-update') {
+    // Accept messages from any origin (since Echo Music is local)
+    if (event.data && event.data.type === 'echo-music-update') {
         const data = event.data;
         mediaState.isPlaying = data.isPlaying || false;
         mediaState.track = data.track || 'Not Playing';
-        mediaState.artist = data.artist || 'Aura Music';
+        mediaState.artist = data.artist || 'Echo Music';
         mediaState.artwork = data.artwork || '';
         mediaState.currentTime = data.currentTime || 0;
         mediaState.duration = data.duration || 0;
@@ -2744,10 +2744,10 @@ function toggleMediaModal() {
 }
 
 function sendMediaCommand(command, value) {
-    const auraMusicFrame = document.querySelector('#aura-music-window iframe, #auramusic-window iframe');
-    if (auraMusicFrame && auraMusicFrame.contentWindow) {
-        auraMusicFrame.contentWindow.postMessage({
-            type: 'aura-music-command',
+    const echoMusicFrame = document.querySelector('#echo-music-window iframe, #echomusic-window iframe');
+    if (echoMusicFrame && echoMusicFrame.contentWindow) {
+        echoMusicFrame.contentWindow.postMessage({
+            type: 'echo-music-command',
             command: command,
             value: value
         }, '*');
@@ -2814,9 +2814,9 @@ function processSetupStep2(isSkipped) {
 }
 
 function finalizeSetup() {
-    localStorage.setItem('os_setup_complete', 'true');
-    localStorage.setItem('os_username', tempUsername);
-    if (tempPassword !== '') localStorage.setItem('os_password', tempPassword);
+    localStorage.setItem('echo_setup_complete', 'true');
+    localStorage.setItem('echo_username', tempUsername);
+    if (tempPassword !== '') localStorage.setItem('echo_password', tempPassword);
 
     document.getElementById('setup-screen').style.display = 'none';
     const lockUsername = document.getElementById('lock-username');
@@ -2846,10 +2846,10 @@ function initializeDesktop() {
     restoreActiveApps();
 
     const desktop = document.getElementById('desktop');
-    const savedWallpaper = localStorage.getItem('os_wallpaper');
+    const savedWallpaper = localStorage.getItem('echo_wallpaper');
     if(savedWallpaper && desktop) desktop.style.backgroundImage = `url('${savedWallpaper}')`;
 
-    const savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
+    const savedApps = JSON.parse(localStorage.getItem('echo_installed_apps') || '[]');
     savedApps.forEach(app => {
         restoreAppToLauncher(app.id, app.icon, app.name);
         if (app.pinned) {
@@ -2878,11 +2878,11 @@ function toggleTheme() {
     const textSpan = document.getElementById('theme-text');
     if (body.getAttribute('data-theme') === 'dark') {
         body.setAttribute('data-theme', 'light');
-        localStorage.setItem('os_theme', 'light');
+        localStorage.setItem('echo_theme', 'light');
         if (textSpan) textSpan.innerText = "Light Theme";
     } else {
         body.setAttribute('data-theme', 'dark');
-        localStorage.setItem('os_theme', 'dark');
+        localStorage.setItem('echo_theme', 'dark');
         if (textSpan) textSpan.innerText = "Dark Theme";
     }
 }
@@ -2976,9 +2976,9 @@ if (uninstallBtn) {
             const storeBtn = document.getElementById('install-btn-' + selectedAppIdToUninstall);
             if(storeBtn) { storeBtn.innerText = 'Install'; storeBtn.disabled = false; }
 
-            let savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
+            let savedApps = JSON.parse(localStorage.getItem('echo_installed_apps') || '[]');
             savedApps = savedApps.filter(app => app.id !== selectedAppIdToUninstall);
-            localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
+            localStorage.setItem('echo_installed_apps', JSON.stringify(savedApps));
 
             notificationMgr.showNotification({ title: "App Uninstalled", message: "Application removed successfully.", icon: "sparkles" });
         }
@@ -3018,11 +3018,11 @@ function launcherContextAction(action) {
         case 'addToShelf':
             if (!document.getElementById('taskbar-' + appId)) {
                 restoreAppToTaskbar(appId, icon, name);
-                let savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
+                let savedApps = JSON.parse(localStorage.getItem('echo_installed_apps') || '[]');
                 const app = savedApps.find(a => a.id === appId);
                 if (app) {
                     app.pinned = true;
-                    localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
+                    localStorage.setItem('echo_installed_apps', JSON.stringify(savedApps));
                 }
                 notificationMgr.showNotification({ 
                     title: "Added to Shelf", 
@@ -3040,9 +3040,9 @@ function launcherContextAction(action) {
                 storeBtn.innerText = 'Install'; 
                 storeBtn.disabled = false; 
             }
-            let savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
+            let savedApps = JSON.parse(localStorage.getItem('echo_installed_apps') || '[]');
             savedApps = savedApps.filter(app => app.id !== appId);
-            localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
+            localStorage.setItem('echo_installed_apps', JSON.stringify(savedApps));
             notificationMgr.showNotification({ 
                 title: "App Uninstalled", 
                 message: `${name} has been removed.`, 
@@ -3112,9 +3112,9 @@ function filterLauncher() {
 }
 
 function lockSystem() {
-    if (localStorage.getItem('os_password')) {
+    if (localStorage.getItem('echo_password')) {
         const lockUsername = document.getElementById('lock-username');
-        if (lockUsername) lockUsername.innerText = localStorage.getItem('os_username') || 'User';
+        if (lockUsername) lockUsername.innerText = localStorage.getItem('echo_username') || 'User';
         const lockScreen = document.getElementById('lock-screen');
         if (lockScreen) lockScreen.style.display = 'flex';
     } else { 
@@ -3130,7 +3130,7 @@ function lockSystem() {
 //     const lockError = document.getElementById('lock-error');
 //     const lockScreen = document.getElementById('lock-screen');
 // 
-//     if (input === localStorage.getItem('os_password') || input === localStorage.getItem('os_answer')) {
+//     if (input === localStorage.getItem('echo_password') || input === localStorage.getItem('echo_answer')) {
 //         if (lockScreen) lockScreen.style.display = 'none';
 //         document.getElementById('lock-password').value = '';
 //         if (lockError) lockError.style.display = 'none';
@@ -3145,7 +3145,7 @@ function lockSystem() {
 function showSecurityQuestion() {
     const hintDiv = document.getElementById('security-hint');
     const qText = document.getElementById('lock-question-text');
-    const savedQ = localStorage.getItem('os_question');
+    const savedQ = localStorage.getItem('echo_question');
     if (qText) qText.innerText = savedQ ? "Hint: " + savedQ : "No security question set.";
     if (hintDiv) hintDiv.style.display = 'block';
 }
@@ -3154,9 +3154,9 @@ function saveSecuritySettings() {
     const pass = document.getElementById('set-password').value;
     const q = document.getElementById('set-question').value;
     const a = document.getElementById('set-answer').value;
-    if(pass) localStorage.setItem('os_password', pass);
-    if(q) localStorage.setItem('os_question', q);
-    if(a) localStorage.setItem('os_answer', a);
+    if(pass) localStorage.setItem('echo_password', pass);
+    if(q) localStorage.setItem('echo_question', q);
+    if(a) localStorage.setItem('echo_answer', a);
     const msg = document.getElementById('security-save-msg');
     if (msg) {
         msg.style.display = 'block'; 
@@ -3479,9 +3479,9 @@ function notepadSaveAs() {
 function notepadSave() {
     if(!currentNotepadFile) { notepadSaveAs(); return; }
     let content = document.getElementById('wordpad-editor').innerHTML;
-    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
+    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
     files[currentNotepadFile] = content;
-    localStorage.setItem('aura_files', JSON.stringify(files));
+    localStorage.setItem('echo_files', JSON.stringify(files));
     notificationMgr.showNotification({ title: "File Saved", message: `${currentNotepadFile} was saved successfully!`, icon: "sparkles" });
     renderFiles();
 }
@@ -3491,7 +3491,7 @@ function notepadOpen() {
     if(!name) return;
     if(!name.endsWith('.txt')) name += '.txt';
 
-    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
+    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
     if(files[name]) {
         document.getElementById('wordpad-editor').innerHTML = files[name];
         currentNotepadFile = name;
@@ -3501,7 +3501,7 @@ function notepadOpen() {
 function renderFiles() {
     const grid = document.getElementById('file-explorer-grid');
     if(!grid) return;
-    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
+    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
     grid.innerHTML = '';
     for(let name in files) {
         grid.innerHTML += `<div class="file-item" ondblclick="window.openFileFromExplorer('${name}')"><div class="f-icon">📄</div><span>${name}</span></div>`;
@@ -3509,7 +3509,7 @@ function renderFiles() {
 }
 
 window.openFileFromExplorer = function(name) {
-    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
+    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
     document.getElementById('wordpad-editor').innerHTML = files[name];
     currentNotepadFile = name;
     openApp('wordpad-window'); 
@@ -3543,7 +3543,7 @@ function setWallpaper(url) {
     let highResUrl = url.replace("w=400", "w=2000");
     const desktop = document.getElementById('desktop');
     if (desktop) desktop.style.backgroundImage = `url('${highResUrl}')`;
-    localStorage.setItem('os_wallpaper', highResUrl);
+    localStorage.setItem('echo_wallpaper', highResUrl);
 }
 
 // Wallpaper upload
@@ -3558,7 +3558,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const desktop = document.getElementById('desktop');
                     if (desktop) desktop.style.backgroundImage = `url('${ev.target.result}')`;
                     try { 
-                        localStorage.setItem('os_wallpaper', ev.target.result); 
+                        localStorage.setItem('echo_wallpaper', ev.target.result); 
                     } catch(err) { 
                         alert("Image applied for this session."); 
                     }
@@ -3676,7 +3676,7 @@ function restoreAppToTaskbar(appId, iconSymbol, appName) {
 }
 
 function saveAppToStorage(appId, iconSymbol, appName) {
-    let savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
+    let savedApps = JSON.parse(localStorage.getItem('echo_installed_apps') || '[]');
     if (!savedApps.find(app => app.id === appId)) {
         savedApps.push({ 
             id: appId, 
@@ -3684,6 +3684,6 @@ function saveAppToStorage(appId, iconSymbol, appName) {
             name: appName,
             pinned: false
         }); 
-        localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
+        localStorage.setItem('echo_installed_apps', JSON.stringify(savedApps));
     }
 }
