@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>iMessage • T9</title>
+<title>Echo Chat • EchoOS</title>
 <style>
   /* ----- iMessage RESET & GLOBAL ----- */
   * {
@@ -532,13 +532,14 @@
     display: none;
   }
 </style>
+<base target="_blank">
 </head>
 <body>
 
 <!-- NAME MODAL -->
 <div id="nameModal" class="modal-overlay">
   <div class="modal">
-    <h2>iMessage · T9</h2>
+    <h2>Echo Chat · EchoOS</h2>
     <input id="nameInput" placeholder="Your name" maxlength="32" autocomplete="off" />
     <button id="nameSubmit">Continue</button>
   </div>
@@ -573,7 +574,7 @@
 <!-- SIDEBAR -->
 <div class="sidebar">
   <div class="section-title">Conversations</div>
-  <div id="publicRoomBtn" class="sidebar-item active">💬 Public</div>
+  <div id="publicRoomBtn" class="sidebar-item active">🌐 Public</div>
   <div id="createRoomBtn" class="sidebar-item">➕ New Chat</div>
   <div id="joinRoomBtn" class="sidebar-item">🔗 Join Chat</div>
   <div id="joinedRooms" style="display:flex;flex-direction:column;gap:2px;margin-top:4px;"></div>
@@ -595,8 +596,36 @@
 </div>
 
 <!-- Firebase compat (ban system) — loaded but NOT used until name submitted -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+// Listen for messages from parent (Echo OS)
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'echo-os-open-chat') {
+    const senderId = event.data.senderId;
+    // Switch to DM room with this user if it exists, or create it
+    const dmRoom = `dm_${[myID, senderId].sort().join('_')}`;
+    if (!joinedRooms.has(dmRoom)) {
+      joinedRooms.add(dmRoom);
+      refreshJoinedRoomsUI();
+    }
+    switchRoom(dmRoom);
+  }
+});
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
+// Listen for messages from parent (Echo OS)
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'echo-os-open-chat') {
+    const senderId = event.data.senderId;
+    // Switch to DM room with this user if it exists, or create it
+    const dmRoom = `dm_${[myID, senderId].sort().join('_')}`;
+    if (!joinedRooms.has(dmRoom)) {
+      joinedRooms.add(dmRoom);
+      refreshJoinedRoomsUI();
+    }
+    switchRoom(dmRoom);
+  }
+});
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
@@ -754,7 +783,7 @@ function appendMessage(payload){
 function appendAIMessage(t){
   const d = document.createElement('div');
   d.className = 'msg ai-msg';
-  d.innerHTML = `<div class="msg-name">🤖 T9 AI <span class="ai-badge">AI</span></div><div class="msg-bubble">${escapeHtml(t)}</div>`;
+  d.innerHTML = `<div class="msg-name">🤖 Echo AI <span class="ai-badge">AI</span></div><div class="msg-bubble">${escapeHtml(t)}</div>`;
   messagesEl.appendChild(d);
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
@@ -763,7 +792,7 @@ function showAITyping(){
   const d = document.createElement('div');
   d.id = 'aiTyping';
   d.className = 'msg ai-msg ai-typing';
-  d.innerHTML = `<div class="msg-name">🤖 T9 AI</div><div class="msg-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`;
+  d.innerHTML = `<div class="msg-name">🤖 Echo AI</div><div class="msg-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`;
   messagesEl.appendChild(d);
 }
 
@@ -783,7 +812,7 @@ async function callAI(prompt){
     let reply = text;
     try{ const json=JSON.parse(text); reply=json.response||json.reply||json.message||json.text||text; } catch{}
     removeAITyping();
-    await push(ref(db,"messages/"+currentRoom),{ name:"T9 AI", id:"AI_BOT", text:reply, timestamp:Date.now(), isAI:true });
+    await push(ref(db,"messages/"+currentRoom),{ name:"Echo AI", id:"AI_BOT", text:reply, timestamp:Date.now(), isAI:true });
   } catch(e){
     removeAITyping();
     appendAIMessage("⚠️ AI error: Unable to get response");
@@ -822,7 +851,22 @@ async function sendMessage(){
   }
   sendBtn.disabled = true;
   try{
-    await push(ref(db,"messages/"+currentRoom),{ name:username, id:myID, text:txt, timestamp:Date.now(), geo:userGeoData });
+    const msgData = { name:username, id:myID, text:txt, timestamp:Date.now(), geo:userGeoData };
+    await push(ref(db,"messages/"+currentRoom), msgData);
+
+    // Notify parent (Echo OS) about the message for DM notifications
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        type: 'echo-chat-message',
+        username: username,
+        profile: '💬',
+        message: txt,
+        senderId: myID,
+        room: currentRoom,
+        timestamp: Date.now()
+      }, '*');
+    }
+
     msgInput.value=''; updateCharCounter();
     lastMessageTime = Date.now();
   } catch(e){
@@ -1098,6 +1142,26 @@ joinRoomBtn.onclick=()=>{
 nameSubmit.addEventListener('click', handleNameSubmit);
 nameInput.addEventListener('keydown', e=>e.key==='Enter'&&handleNameSubmit(e));
 setTimeout(()=>nameInput.focus(), 100);
+
+// Signal to parent that Echo Chat is ready
+if (window.parent !== window) {
+  window.parent.postMessage({ type: 'echo-chat-ready' }, '*');
+}
+
+
+// Listen for messages from parent (Echo OS)
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'echo-os-open-chat') {
+    const senderId = event.data.senderId;
+    // Switch to DM room with this user if it exists, or create it
+    const dmRoom = `dm_${[myID, senderId].sort().join('_')}`;
+    if (!joinedRooms.has(dmRoom)) {
+      joinedRooms.add(dmRoom);
+      refreshJoinedRoomsUI();
+    }
+    switchRoom(dmRoom);
+  }
+});
 </script>
 </body>
 </html>
