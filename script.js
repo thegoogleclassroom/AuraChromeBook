@@ -387,6 +387,529 @@ function signOutAccount() {
 }
 
 // Override the original finalizeSetup to save to account
+let highestZ = 10;
+function openApp(appId) {
+    const appWindow = document.getElementById(appId);
+    if(appWindow) {
+        const iframe = appWindow.querySelector('iframe');
+        if (iframe) {
+            const currentSrc = iframe.src || "";
+            if (currentSrc === "" || currentSrc.includes("about:blank") || currentSrc.includes(window.location.href)) {
+                iframe.src = iframe.getAttribute('data-src');
+            }
+        }
+        appWindow.style.display = 'flex'; 
+        appWindow.classList.remove('minimized');
+        bringToFront(appWindow); 
+        updateTaskbarIndicator(appId, true);
+    }
+    if (launcherMenu) launcherMenu.style.display = 'none';
+}
+
+function minimizeApp(appId) { 
+    const appWindow = document.getElementById(appId);
+    if (appWindow) appWindow.classList.add('minimized'); 
+    updateTaskbarIndicator(appId, false); 
+}
+
+function maximizeApp(appId) { 
+    const appWindow = document.getElementById(appId);
+    if (appWindow) appWindow.classList.toggle('fullscreen'); 
+}
+
+function closeApp(appId) {
+    const appWindow = document.getElementById(appId);
+    if (!appWindow) return;
+
+    appWindow.style.display = 'none'; 
+    appWindow.classList.remove('minimized');
+    appWindow.classList.remove('fullscreen');
+    updateTaskbarIndicator(appId, false);
+
+    const iframe = appWindow.querySelector('iframe');
+    if(iframe) iframe.src = 'about:blank'; 
+}
+
+function toggleApp(appId) {
+    const appWindow = document.getElementById(appId);
+    if (!appWindow) return;
+
+    if (appWindow.style.display === 'flex' && !appWindow.classList.contains('minimized')) {
+        if (appWindow.style.zIndex == highestZ) minimizeApp(appId); 
+        else bringToFront(appWindow);
+    } else openApp(appId);
+}
+
+function bringToFront(elmnt) { 
+    highestZ++; 
+    // Cap z-index so windows never go above launcher/quick settings
+    if (highestZ >= 9990) highestZ = 11;
+    elmnt.style.zIndex = highestZ; 
+    const iframe = elmnt.querySelector('iframe');
+    if(iframe && iframe.contentWindow) {
+        iframe.focus();
+    }
+}
+
+
+// --- IFRAME FOCUS & KEYBOARD FIX ---
+// Track the currently active window for keyboard forwarding
+let activeGameWindow = null;
+
+// Override bringToFront to also track active window and focus iframe properly
+const originalBringToFront = bringToFront;
+bringToFront = function(elmnt) {
+    originalBringToFront ? originalBringToFront(elmnt) : undefined;
+    activeGameWindow = elmnt.id;
+
+    // Focus the iframe content window for keyboard capture
+    const iframe = elmnt.querySelector('iframe');
+    if (iframe) {
+        // Use contentWindow.focus() instead of iframe.focus()
+        try {
+            iframe.contentWindow.focus();
+        } catch(e) {
+            // Cross-origin might block this, fallback to iframe element focus
+            iframe.focus();
+        }
+
+        // Also ensure the iframe is clickable by adding a one-time click handler
+        // that refocuses it (for games that lose focus)
+        const contentArea = elmnt.querySelector('.window-content');
+        if (contentArea) {
+            contentArea.onclick = function(e) {
+                // Only focus if clicking on the content area background, not buttons
+                if (e.target === contentArea || e.target.tagName === 'IFRAME') {
+                    try {
+                        iframe.contentWindow.focus();
+                    } catch(err) {
+                        iframe.focus();
+                    }
+                }
+            };
+        }
+    }
+};
+
+// Global keyboard event forwarding to active iframe
+// This captures keys at the document level and sends them to the active game
+document.addEventListener('keydown', function(e) {
+    if (!activeGameWindow) return;
+
+    const win = document.getElementById(activeGameWindow);
+    if (!win || win.style.display === 'none' || win.classList.contains('minimized')) {
+        activeGameWindow = null;
+        return;
+    }
+
+    const iframe = win.querySelector('iframe');
+    if (!iframe || !iframe.contentWindow) return;
+
+    // Don't forward if user is typing in an input/textarea in the parent
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) {
+        return;
+    }
+
+    // Forward the keyboard event to the iframe
+    try {
+        // Try to focus the iframe first
+        iframe.contentWindow.focus();
+
+        // For same-origin iframes, we can dispatch the event
+        // For cross-origin, focusing is the best we can do
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        if (iframeDoc) {
+            const evt = new KeyboardEvent('keydown', {
+                key: e.key,
+                code: e.code,
+                keyCode: e.keyCode,
+                which: e.which,
+                ctrlKey: e.ctrlKey,
+                shiftKey: e.shiftKey,
+                altKey: e.altKey,
+                metaKey: e.metaKey,
+                bubbles: true
+            });
+            iframeDoc.dispatchEvent(evt);
+
+            // Prevent default browser actions for game keys (WASD, Space, etc.)
+            if (['w','a','s','d','W','A','S','D',' ','Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Shift','Control'].includes(e.key) || 
+                [87,65,83,68,32,38,40,37,39,16,17].includes(e.keyCode)) {
+                e.preventDefault();
+            }
+        }
+    } catch(err) {
+        // Cross-origin restriction - just ensure focus is there
+        iframe.focus();
+    }
+}, true); // Use capture phase to get events before they bubble
+
+// Also handle keyup for games that need it
+document.addEventListener('keyup', function(e) {
+    if (!activeGameWindow) return;
+
+    const win = document.getElementById(activeGameWindow);
+    if (!win || win.style.display === 'none' || win.classList.contains('minimized')) return;
+
+    const iframe = win.querySelector('iframe');
+    if (!iframe) return;
+
+    try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        if (iframeDoc) {
+            const evt = new KeyboardEvent('keyup', {
+                key: e.key,
+                code: e.code,
+                keyCode: e.keyCode,
+                which: e.which,
+                ctrlKey: e.ctrlKey,
+                shiftKey: e.shiftKey,
+                altKey: e.altKey,
+                metaKey: e.metaKey,
+                bubbles: true
+            });
+            iframeDoc.dispatchEvent(evt);
+        }
+    } catch(err) {
+        // Cross-origin - ignore
+    }
+}, true);
+
+// Make all windows focusable by adding tabindex
+// This allows the window itself to receive focus events
+document.querySelectorAll('.window').forEach(win => {
+    win.setAttribute('tabindex', '-1');
+    win.style.outline = 'none';
+});
+
+// When clicking on a window header, focus the window and its iframe
+document.querySelectorAll('.window-header').forEach(header => {
+    header.addEventListener('click', function() {
+        const win = this.closest('.window');
+        if (win) {
+            win.focus();
+            const iframe = win.querySelector('iframe');
+            if (iframe) {
+                try { iframe.contentWindow.focus(); } catch(e) { iframe.focus(); }
+            }
+        }
+    });
+});
+
+function updateTaskbarIndicator(appId, isActive) {
+    const icon = document.querySelector(`button[onclick*="'${appId}'"]`);
+    if(icon) {
+        if (isActive) icon.classList.add('active');
+        else icon.classList.remove('active');
+    }
+}
+
+// Window Dragging 
+const snapPreview = document.getElementById('snap-preview');
+let currentSnap = null;
+
+document.querySelectorAll('.window').forEach(win => {
+    dragElement(win); 
+    win.addEventListener('mousedown', () => bringToFront(win));
+});
+
+function dragElement(elmnt) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    const header = document.getElementById(elmnt.id + "-header");
+    if (header) header.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        if(e.target.tagName === 'BUTTON') return;
+        if(elmnt.classList.contains('fullscreen')) return; 
+        e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY;
+        document.onmouseup = closeDragElement; document.onmousemove = elementDrag;
+        elmnt.classList.add('dragging');
+    }
+    function elementDrag(e) {
+        e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY;
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px"; elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        const th = 20; 
+        if (e.clientX < th) { showPreview(0, 0, '50%', '100%'); currentSnap = 'left'; } 
+        else if (e.clientX > window.innerWidth - th) { showPreview('50%', 0, '50%', '100%'); currentSnap = 'right'; } 
+        else if (e.clientY < th) { showPreview(0, 0, '100%', '100%'); currentSnap = 'top'; } 
+        else { 
+            if (snapPreview) snapPreview.style.display = 'none'; 
+            currentSnap = null; 
+        }
+    }
+    function showPreview(l, t, w, h) { 
+        if (!snapPreview) return;
+        snapPreview.style.display = 'block'; 
+        snapPreview.style.left = l; 
+        snapPreview.style.top = t; 
+        snapPreview.style.width = w; 
+        snapPreview.style.height = h; 
+    }
+    function closeDragElement() {
+        document.onmouseup = null; 
+        document.onmousemove = null; 
+        elmnt.classList.remove('dragging'); 
+        if (snapPreview) snapPreview.style.display = 'none';
+        if (currentSnap === 'left') { 
+            elmnt.style.left = '0'; 
+            elmnt.style.top = '0'; 
+            elmnt.style.width = '50vw'; 
+            elmnt.style.height = '100vh'; 
+        } else if (currentSnap === 'right') { 
+            elmnt.style.left = '50vw'; 
+            elmnt.style.top = '0'; 
+            elmnt.style.width = '50vw'; 
+            elmnt.style.height = '100vh'; 
+        } else if (currentSnap === 'top') { 
+            elmnt.classList.add('fullscreen'); 
+            elmnt.style.width=''; 
+            elmnt.style.height=''; 
+            elmnt.style.top=''; 
+            elmnt.style.left=''; 
+        }
+        currentSnap = null;
+    }
+}
+
+function dragDesktopIcon(elmnt) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    elmnt.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY;
+        document.onmouseup = closeDragElement; document.onmousemove = elementDrag;
+    }
+    function elementDrag(e) {
+        e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY;
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px"; elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+    function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
+}
+
+// --- Local File Explorer & Notepad ---
+let currentNotepadFile = null;
+
+function notepadSaveAs() {
+    let name = prompt("Enter file name (e.g. MyNotes):");
+    if(!name) return;
+    if(!name.endsWith('.txt')) name += '.txt';
+    currentNotepadFile = name;
+    notepadSave();
+}
+
+function notepadSave() {
+    if(!currentNotepadFile) { notepadSaveAs(); return; }
+    let content = document.getElementById('wordpad-editor').innerHTML;
+    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
+    files[currentNotepadFile] = content;
+    localStorage.setItem('echo_files', JSON.stringify(files));
+    notificationMgr.showNotification({ title: "File Saved", message: `${currentNotepadFile} was saved successfully!`, icon: "sparkles" });
+    renderFiles();
+}
+
+function notepadOpen() {
+    let name = prompt("Enter the exact file name to open:");
+    if(!name) return;
+    if(!name.endsWith('.txt')) name += '.txt';
+
+    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
+    if(files[name]) {
+        document.getElementById('wordpad-editor').innerHTML = files[name];
+        currentNotepadFile = name;
+    } else { alert("File not found!"); }
+}
+
+function renderFiles() {
+    const grid = document.getElementById('file-explorer-grid');
+    if(!grid) return;
+    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
+    grid.innerHTML = '';
+    for(let name in files) {
+        grid.innerHTML += `<div class="file-item" ondblclick="window.openFileFromExplorer('${name}')"><div class="f-icon">📄</div><span>${name}</span></div>`;
+    }
+}
+
+window.openFileFromExplorer = function(name) {
+    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
+    document.getElementById('wordpad-editor').innerHTML = files[name];
+    currentNotepadFile = name;
+    openApp('wordpad-window'); 
+};
+
+// --- Applications Logic ---
+let calcInput = "";
+function calcPress(val) { 
+    calcInput += val; 
+    const display = document.getElementById('calc-display');
+    if (display) display.value = calcInput; 
+}
+function calcClear() { 
+    calcInput = ""; 
+    const display = document.getElementById('calc-display');
+    if (display) display.value = "0"; 
+}
+function calcEval() { 
+    try { 
+        calcInput = eval(calcInput).toString(); 
+        const display = document.getElementById('calc-display');
+        if (display) display.value = calcInput; 
+    } catch(e) { 
+        const display = document.getElementById('calc-display');
+        if (display) display.value = "Error"; 
+        calcInput = ""; 
+    } 
+}
+
+function setWallpaper(url) {
+    let highResUrl = url.replace("w=400", "w=2000");
+    const desktop = document.getElementById('desktop');
+    if (desktop) desktop.style.backgroundImage = `url('${highResUrl}')`;
+    localStorage.setItem('echo_wallpaper', highResUrl);
+}
+
+// Wallpaper upload
+document.addEventListener('DOMContentLoaded', function() {
+    const wallpaperUpload = document.getElementById('wallpaper-upload');
+    if (wallpaperUpload) {
+        wallpaperUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const desktop = document.getElementById('desktop');
+                    if (desktop) desktop.style.backgroundImage = `url('${ev.target.result}')`;
+                    try { 
+                        localStorage.setItem('echo_wallpaper', ev.target.result); 
+                    } catch(err) { 
+                        alert("Image applied for this session."); 
+                    }
+                }; 
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+
+// --- Taskbar & Play Store Logic ---
+function switchStoreTab(tabId) {
+    document.querySelectorAll('.play-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.store-tab-content').forEach(content => content.classList.remove('active'));
+    const tabBtn = document.querySelector(`[onclick="switchStoreTab('${tabId}')"]`);
+    if (tabBtn) tabBtn.classList.add('active');
+    const tabContent = document.getElementById(`store-${tabId}-tab`);
+    if (tabContent) tabContent.classList.add('active');
+}
+
+const taskbarIconsContainer = document.getElementById('app-icons');
+let draggedIcon = null;
+
+function makeIconDraggable(icon) {
+    icon.addEventListener('dragstart', function() { 
+        draggedIcon = this; 
+        setTimeout(() => this.classList.add('dragging-icon'), 0); 
+    });
+    icon.addEventListener('dragend', function() { 
+        setTimeout(() => { 
+            this.classList.remove('dragging-icon'); 
+            draggedIcon = null; 
+        }, 0); 
+    });
+    icon.addEventListener('dragover', (e) => e.preventDefault());
+    icon.addEventListener('drop', function(e) {
+        e.preventDefault();
+        if (draggedIcon !== this && taskbarIconsContainer) {
+            let allIcons = [...taskbarIconsContainer.children];
+            allIcons.indexOf(draggedIcon) < allIcons.indexOf(this) ? this.after(draggedIcon) : this.before(draggedIcon);
+        }
+    });
+}
+
+function installApp(appId, iconSymbol, appName, buttonElement) {
+    const launcherList = document.getElementById('launcher-list');
+    const existingItem = launcherList ? launcherList.querySelector(`[data-app-id="${appId}"]`) : null;
+    if (existingItem) {
+        notificationMgr.showNotification({ 
+            title: "Already Installed", 
+            message: `${appName} is already in your launcher.`, 
+            icon: "sparkles" 
+        });
+        return;
+    }
+
+    const pCont = document.getElementById('progress-container-' + appId);
+    const pBar = document.getElementById('progress-bar-' + appId);
+
+    buttonElement.innerText = 'Installing...'; 
+    buttonElement.disabled = true; 
+    if(pCont) pCont.style.display = 'block';
+
+    let progress = 0;
+    const dlInterval = setInterval(() => {
+        progress += Math.floor(Math.random() * 20) + 10; 
+        if (progress >= 100) {
+            progress = 100; 
+            clearInterval(dlInterval);
+            if(pBar) pBar.style.width = '100%';
+            buttonElement.innerText = 'Installed'; 
+            if(pCont) setTimeout(() => pCont.style.display = 'none', 500);
+
+            restoreAppToLauncher(appId, iconSymbol, appName); 
+            saveAppToStorage(appId, iconSymbol, appName);
+
+            notificationMgr.showNotification({ 
+                title: "Installation Complete", 
+                message: `${appName} has been added to your launcher. Right-click to add to shelf.`, 
+                icon: "sparkles" 
+            });
+        } else if(pBar) {
+            pBar.style.width = progress + '%';
+        }
+    }, 300); 
+}
+
+function restoreAppToLauncher(appId, iconSymbol, appName) {
+    const launcherList = document.getElementById('launcher-list');
+    if (!launcherList || launcherList.querySelector(`[data-app-id="${appId}"]`)) return;
+
+    const item = document.createElement('div');
+    item.className = 'launcher-item';
+    item.setAttribute('data-app-id', appId);
+    item.setAttribute('data-icon', iconSymbol);
+    item.setAttribute('data-name', appName);
+    item.onclick = () => openApp(appId);
+    item.innerHTML = `<div class="l-icon">${iconSymbol}</div><span class="l-text">${appName}</span>`;
+    launcherList.appendChild(item);
+}
+
+function restoreAppToTaskbar(appId, iconSymbol, appName) {
+    if (document.getElementById('taskbar-' + appId)) return;
+
+    const btn = document.createElement('button'); 
+    btn.className = 'app-icon'; 
+    btn.id = 'taskbar-' + appId; 
+    btn.title = appName; 
+    btn.innerHTML = iconSymbol; 
+    btn.draggable = true; 
+    btn.onclick = () => toggleApp(appId);
+
+    if (taskbarIconsContainer) taskbarIconsContainer.appendChild(btn); 
+    makeIconDraggable(btn);
+}
+
+function saveAppToStorage(appId, iconSymbol, appName) {
+    let savedApps = JSON.parse(localStorage.getItem('echo_installed_apps') || '[]');
+    if (!savedApps.find(app => app.id === appId)) {
+        savedApps.push({ 
+            id: appId, 
+            icon: iconSymbol, 
+            name: appName,
+            pinned: false
+        }); 
+        localStorage.setItem('echo_installed_apps', JSON.stringify(savedApps));
+    }
+}
+
 const originalFinalizeSetup = window.finalizeSetup;
 window.finalizeSetup = function() {
     localStorage.setItem('echo_setup_complete', 'true');
@@ -430,8 +953,7 @@ window.unlockOS = function() {
         if (lockScreen) lockScreen.style.display = 'none';
         document.getElementById('lock-password').value = '';
         if (lockError) lockError.style.display = 'none';
-        showUpdateModal();
-        triggerInitialNotifications();
+        showCreatorScreen();
     } else {
         if (lockError) lockError.style.display = 'block';
     }
@@ -1140,6 +1662,7 @@ const PS_GAMES = {
 const PS_APPS = {
     'chrome-window': { id: 'chrome-window', name: 'Chrome', icon: '🌐', category: 'browser', rating: 4.9, banner: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=800', desc: 'Fast, secure web browser with built-in proxy support.', controls: 'Mouse and keyboard' },
     'discord-window': { id: 'discord-window', name: 'Discord', icon: '💬', category: 'social', rating: 4.8, banner: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=800', desc: 'Chat and connect with friends and communities.', controls: 'Mouse and keyboard' },
+    'echochat-window': { id: 'echochat-window', name: 'Echo Chat', icon: '💬', category: 'social', rating: 4.9, banner: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=800', desc: 'Chat with friends and communities in real-time with DM notifications.', controls: 'Mouse and keyboard' },
     'echoflix-window': { id: 'echoflix-window', name: 'EchoFlix', icon: '🎬', category: 'entertainment', rating: 4.7, banner: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=800', desc: 'Stream movies and shows on EchoFlix.', controls: 'Mouse and keyboard' },
     'echomusic-window': { id: 'echomusic-window', name: 'Echo Music', icon: '🎵', category: 'entertainment', rating: 4.8, banner: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800', desc: 'Stream music from Spotify and SoundCloud.', controls: 'Mouse and keyboard' },
     'files-window': { id: 'files-window', name: 'Files', icon: '📁', category: 'productivity', rating: 4.5, banner: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800', desc: 'Manage your local files and documents.', controls: 'Mouse and keyboard' },
@@ -1181,7 +1704,7 @@ function saveFavorites(data) {
 // Track when a game is opened
 const originalOpenAppForPS = openApp;
 openApp = function(appId) {
-    const result = originalOpenAppForPS(appId);
+    const result = originalOpenAppForPS ? originalOpenAppForPS(appId) : undefined;
 
     // Track play time
     if (PS_GAMES[appId]) {
@@ -1684,7 +2207,7 @@ function clearPlayStoreData() {
 // Also init apps panel when store opens
 const originalOpenAppPS_v2 = openApp;
 openApp = function(appId) {
-    const result = originalOpenAppPS_v2(appId);
+    const result = originalOpenAppPS_v2 ? originalOpenAppPS_v2(appId) : undefined;
     if (appId === 'store-window') {
         setTimeout(() => {
             renderPlayStoreApps();
@@ -1694,7 +2217,7 @@ openApp = function(appId) {
 };
 const originalOpenAppPS = openApp;
 openApp = function(appId) {
-    const result = originalOpenAppPS(appId);
+    const result = originalOpenAppPS ? originalOpenAppPS(appId) : undefined;
 
     if (appId === 'store-window') {
         setTimeout(() => {
@@ -1978,6 +2501,53 @@ function initServerWarningBanner() {
         }, 1000);
         sessionStorage.setItem('echo_server_warning_shown', 'true');
     }, 10000);
+}
+
+
+
+// ===== CREATOR SCREEN LOGIC =====
+function showCreatorScreen() {
+    const creatorScreen = document.getElementById('creator-screen');
+    const creatorText = document.getElementById('creator-text');
+    const desktop = document.getElementById('desktop');
+
+    if (!creatorScreen) return;
+
+    creatorScreen.style.display = 'flex';
+    creatorScreen.style.opacity = '1';
+
+    // Fade in text
+    setTimeout(() => {
+        creatorText.style.opacity = '1';
+    }, 100);
+
+    // Fade out text after 2.5 seconds
+    setTimeout(() => {
+        creatorText.style.opacity = '0';
+    }, 2500);
+
+    // Fade out screen and show desktop
+    setTimeout(() => {
+        creatorScreen.style.transition = 'opacity 1s ease-out';
+        creatorScreen.style.opacity = '0';
+
+        setTimeout(() => {
+            creatorScreen.style.display = 'none';
+            // Now show desktop with fade in
+            if (desktop) {
+                desktop.style.opacity = '0';
+                desktop.style.transition = 'opacity 1s ease-in';
+                setTimeout(() => {
+                    desktop.style.opacity = '1';
+                }, 100);
+            }
+            // Show update modal after desktop fades in
+            setTimeout(() => {
+                showUpdateModal();
+                triggerInitialNotifications();
+            }, 1000);
+        }, 1000);
+    }, 3500);
 }
 
 // ===== ECHO OS UPDATE MODAL =====
@@ -2423,7 +2993,7 @@ openApp = function(appId) {
             deskWindows[currentDesk].push(appId);
         }
     }
-    return originalOpenApp(appId);
+    return originalOpenApp ? originalOpenApp(appId) : undefined;
 };
 
 
@@ -2453,7 +3023,8 @@ function trackActiveApps() {
                 'linkcreator-window': '🔗',
                 'granny2-window': '👵',
                 'pokemon-window': '⚡',
-                '1v1lol-window': '🔫'
+                '1v1lol-window': '🔫',
+                'echochat-window': '💬'
             };
             activeWindows.push({ id: appId, name: name, icon: iconMap[appId] || '📦' });
         }
@@ -2494,21 +3065,21 @@ function restoreActiveApps() {
 // Track active apps when window state changes
 const originalOpenAppTrack = openApp;
 openApp = function(appId) {
-    const result = originalOpenAppTrack(appId);
+    const result = originalOpenAppTrack ? originalOpenAppTrack(appId) : undefined;
     trackActiveApps();
     return result;
 };
 
 const originalCloseAppTrack = closeApp;
 closeApp = function(appId) {
-    const result = originalCloseAppTrack(appId);
+    const result = originalCloseAppTrack ? originalCloseAppTrack(appId) : undefined;
     trackActiveApps();
     return result;
 };
 
 const originalMinimizeAppTrack = minimizeApp;
 minimizeApp = function(appId) {
-    const result = originalMinimizeAppTrack(appId);
+    const result = originalMinimizeAppTrack ? originalMinimizeAppTrack(appId) : undefined;
     trackActiveApps();
     return result;
 };
@@ -2658,6 +3229,80 @@ function initLinkCreator() {
 }
 
 
+
+
+
+// ===== ECHO CHAT DM NOTIFICATION SYSTEM =====
+// Listen for messages from Echo Chat iframe
+window.addEventListener('message', function(event) {
+    // Handle Echo Chat DM notifications
+    if (event.data && event.data.type === 'echo-chat-dm') {
+        const data = event.data;
+        showChatNotification(data);
+    }
+});
+
+function showChatNotification(data) {
+    const { username, profile, message, senderId } = data;
+
+    // Create notification
+    notificationMgr.showNotification({
+        title: username,
+        message: message,
+        icon: "chat"
+    });
+
+    // Also add to quick settings notification list with avatar
+    const qsList = document.getElementById('qs-notif-list');
+    if (qsList) {
+        const noNotifs = qsList.querySelector('.qs-no-notifs');
+        if (noNotifs) noNotifs.remove();
+
+        const qsItem = document.createElement('div');
+        qsItem.className = 'qs-notif-item';
+        qsItem.style.cursor = 'pointer';
+        qsItem.onclick = function() {
+            openApp('echochat-window');
+            // Tell Echo Chat to open the specific conversation
+            const chatFrame = document.querySelector('#echochat-window iframe');
+            if (chatFrame && chatFrame.contentWindow) {
+                chatFrame.contentWindow.postMessage({
+                    type: 'echo-os-open-chat',
+                    senderId: senderId
+                }, '*');
+            }
+            qsItem.remove();
+            checkEmptyNotifs();
+        };
+
+        qsItem.innerHTML = `
+            <div class="chat-notif-avatar">${profile || '👤'}</div>
+            <div class="chat-notif-content">
+                <div class="chat-notif-username">${username}</div>
+                <div class="chat-notif-message">${message}</div>
+            </div>
+            <button class="qs-notif-close" onclick="event.stopPropagation(); this.parentElement.remove(); checkEmptyNotifs();">✕</button>
+        `;
+        qsList.prepend(qsItem);
+    }
+
+    // Make notification clickable to open chat
+    const notifContainer = document.getElementById('notification-toast-container');
+    if (notifContainer && notifContainer.lastChild) {
+        notifContainer.lastChild.style.cursor = 'pointer';
+        notifContainer.lastChild.onclick = function() {
+            openApp('echochat-window');
+            const chatFrame = document.querySelector('#echochat-window iframe');
+            if (chatFrame && chatFrame.contentWindow) {
+                chatFrame.contentWindow.postMessage({
+                    type: 'echo-os-open-chat',
+                    senderId: senderId
+                }, '*');
+            }
+            notifContainer.lastChild.remove();
+        };
+    }
+}
 
 // --- Media Control System ---
 let mediaState = {
@@ -3165,525 +3810,3 @@ function saveSecuritySettings() {
 }
 
 // --- Window Memory Management ---
-let highestZ = 10;
-function openApp(appId) {
-    const appWindow = document.getElementById(appId);
-    if(appWindow) {
-        const iframe = appWindow.querySelector('iframe');
-        if (iframe) {
-            const currentSrc = iframe.src || "";
-            if (currentSrc === "" || currentSrc.includes("about:blank") || currentSrc.includes(window.location.href)) {
-                iframe.src = iframe.getAttribute('data-src');
-            }
-        }
-        appWindow.style.display = 'flex'; 
-        appWindow.classList.remove('minimized');
-        bringToFront(appWindow); 
-        updateTaskbarIndicator(appId, true);
-    }
-    if (launcherMenu) launcherMenu.style.display = 'none';
-}
-
-function minimizeApp(appId) { 
-    const appWindow = document.getElementById(appId);
-    if (appWindow) appWindow.classList.add('minimized'); 
-    updateTaskbarIndicator(appId, false); 
-}
-
-function maximizeApp(appId) { 
-    const appWindow = document.getElementById(appId);
-    if (appWindow) appWindow.classList.toggle('fullscreen'); 
-}
-
-function closeApp(appId) {
-    const appWindow = document.getElementById(appId);
-    if (!appWindow) return;
-
-    appWindow.style.display = 'none'; 
-    appWindow.classList.remove('minimized');
-    appWindow.classList.remove('fullscreen');
-    updateTaskbarIndicator(appId, false);
-
-    const iframe = appWindow.querySelector('iframe');
-    if(iframe) iframe.src = 'about:blank'; 
-}
-
-function toggleApp(appId) {
-    const appWindow = document.getElementById(appId);
-    if (!appWindow) return;
-
-    if (appWindow.style.display === 'flex' && !appWindow.classList.contains('minimized')) {
-        if (appWindow.style.zIndex == highestZ) minimizeApp(appId); 
-        else bringToFront(appWindow);
-    } else openApp(appId);
-}
-
-function bringToFront(elmnt) { 
-    highestZ++; 
-    // Cap z-index so windows never go above launcher/quick settings
-    if (highestZ >= 9990) highestZ = 11;
-    elmnt.style.zIndex = highestZ; 
-    const iframe = elmnt.querySelector('iframe');
-    if(iframe && iframe.contentWindow) {
-        iframe.focus();
-    }
-}
-
-
-// --- IFRAME FOCUS & KEYBOARD FIX ---
-// Track the currently active window for keyboard forwarding
-let activeGameWindow = null;
-
-// Override bringToFront to also track active window and focus iframe properly
-const originalBringToFront = bringToFront;
-bringToFront = function(elmnt) {
-    originalBringToFront(elmnt);
-    activeGameWindow = elmnt.id;
-
-    // Focus the iframe content window for keyboard capture
-    const iframe = elmnt.querySelector('iframe');
-    if (iframe) {
-        // Use contentWindow.focus() instead of iframe.focus()
-        try {
-            iframe.contentWindow.focus();
-        } catch(e) {
-            // Cross-origin might block this, fallback to iframe element focus
-            iframe.focus();
-        }
-
-        // Also ensure the iframe is clickable by adding a one-time click handler
-        // that refocuses it (for games that lose focus)
-        const contentArea = elmnt.querySelector('.window-content');
-        if (contentArea) {
-            contentArea.onclick = function(e) {
-                // Only focus if clicking on the content area background, not buttons
-                if (e.target === contentArea || e.target.tagName === 'IFRAME') {
-                    try {
-                        iframe.contentWindow.focus();
-                    } catch(err) {
-                        iframe.focus();
-                    }
-                }
-            };
-        }
-    }
-};
-
-// Global keyboard event forwarding to active iframe
-// This captures keys at the document level and sends them to the active game
-document.addEventListener('keydown', function(e) {
-    if (!activeGameWindow) return;
-
-    const win = document.getElementById(activeGameWindow);
-    if (!win || win.style.display === 'none' || win.classList.contains('minimized')) {
-        activeGameWindow = null;
-        return;
-    }
-
-    const iframe = win.querySelector('iframe');
-    if (!iframe || !iframe.contentWindow) return;
-
-    // Don't forward if user is typing in an input/textarea in the parent
-    const activeEl = document.activeElement;
-    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) {
-        return;
-    }
-
-    // Forward the keyboard event to the iframe
-    try {
-        // Try to focus the iframe first
-        iframe.contentWindow.focus();
-
-        // For same-origin iframes, we can dispatch the event
-        // For cross-origin, focusing is the best we can do
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        if (iframeDoc) {
-            const evt = new KeyboardEvent('keydown', {
-                key: e.key,
-                code: e.code,
-                keyCode: e.keyCode,
-                which: e.which,
-                ctrlKey: e.ctrlKey,
-                shiftKey: e.shiftKey,
-                altKey: e.altKey,
-                metaKey: e.metaKey,
-                bubbles: true
-            });
-            iframeDoc.dispatchEvent(evt);
-
-            // Prevent default browser actions for game keys (WASD, Space, etc.)
-            if (['w','a','s','d','W','A','S','D',' ','Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Shift','Control'].includes(e.key) || 
-                [87,65,83,68,32,38,40,37,39,16,17].includes(e.keyCode)) {
-                e.preventDefault();
-            }
-        }
-    } catch(err) {
-        // Cross-origin restriction - just ensure focus is there
-        iframe.focus();
-    }
-}, true); // Use capture phase to get events before they bubble
-
-// Also handle keyup for games that need it
-document.addEventListener('keyup', function(e) {
-    if (!activeGameWindow) return;
-
-    const win = document.getElementById(activeGameWindow);
-    if (!win || win.style.display === 'none' || win.classList.contains('minimized')) return;
-
-    const iframe = win.querySelector('iframe');
-    if (!iframe) return;
-
-    try {
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        if (iframeDoc) {
-            const evt = new KeyboardEvent('keyup', {
-                key: e.key,
-                code: e.code,
-                keyCode: e.keyCode,
-                which: e.which,
-                ctrlKey: e.ctrlKey,
-                shiftKey: e.shiftKey,
-                altKey: e.altKey,
-                metaKey: e.metaKey,
-                bubbles: true
-            });
-            iframeDoc.dispatchEvent(evt);
-        }
-    } catch(err) {
-        // Cross-origin - ignore
-    }
-}, true);
-
-// Make all windows focusable by adding tabindex
-// This allows the window itself to receive focus events
-document.querySelectorAll('.window').forEach(win => {
-    win.setAttribute('tabindex', '-1');
-    win.style.outline = 'none';
-});
-
-// When clicking on a window header, focus the window and its iframe
-document.querySelectorAll('.window-header').forEach(header => {
-    header.addEventListener('click', function() {
-        const win = this.closest('.window');
-        if (win) {
-            win.focus();
-            const iframe = win.querySelector('iframe');
-            if (iframe) {
-                try { iframe.contentWindow.focus(); } catch(e) { iframe.focus(); }
-            }
-        }
-    });
-});
-
-function updateTaskbarIndicator(appId, isActive) {
-    const icon = document.querySelector(`button[onclick*="'${appId}'"]`);
-    if(icon) {
-        if (isActive) icon.classList.add('active');
-        else icon.classList.remove('active');
-    }
-}
-
-// Window Dragging 
-const snapPreview = document.getElementById('snap-preview');
-let currentSnap = null;
-
-document.querySelectorAll('.window').forEach(win => {
-    dragElement(win); 
-    win.addEventListener('mousedown', () => bringToFront(win));
-});
-
-function dragElement(elmnt) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    const header = document.getElementById(elmnt.id + "-header");
-    if (header) header.onmousedown = dragMouseDown;
-
-    function dragMouseDown(e) {
-        if(e.target.tagName === 'BUTTON') return;
-        if(elmnt.classList.contains('fullscreen')) return; 
-        e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY;
-        document.onmouseup = closeDragElement; document.onmousemove = elementDrag;
-        elmnt.classList.add('dragging');
-    }
-    function elementDrag(e) {
-        e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY;
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px"; elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-        const th = 20; 
-        if (e.clientX < th) { showPreview(0, 0, '50%', '100%'); currentSnap = 'left'; } 
-        else if (e.clientX > window.innerWidth - th) { showPreview('50%', 0, '50%', '100%'); currentSnap = 'right'; } 
-        else if (e.clientY < th) { showPreview(0, 0, '100%', '100%'); currentSnap = 'top'; } 
-        else { 
-            if (snapPreview) snapPreview.style.display = 'none'; 
-            currentSnap = null; 
-        }
-    }
-    function showPreview(l, t, w, h) { 
-        if (!snapPreview) return;
-        snapPreview.style.display = 'block'; 
-        snapPreview.style.left = l; 
-        snapPreview.style.top = t; 
-        snapPreview.style.width = w; 
-        snapPreview.style.height = h; 
-    }
-    function closeDragElement() {
-        document.onmouseup = null; 
-        document.onmousemove = null; 
-        elmnt.classList.remove('dragging'); 
-        if (snapPreview) snapPreview.style.display = 'none';
-        if (currentSnap === 'left') { 
-            elmnt.style.left = '0'; 
-            elmnt.style.top = '0'; 
-            elmnt.style.width = '50vw'; 
-            elmnt.style.height = '100vh'; 
-        } else if (currentSnap === 'right') { 
-            elmnt.style.left = '50vw'; 
-            elmnt.style.top = '0'; 
-            elmnt.style.width = '50vw'; 
-            elmnt.style.height = '100vh'; 
-        } else if (currentSnap === 'top') { 
-            elmnt.classList.add('fullscreen'); 
-            elmnt.style.width=''; 
-            elmnt.style.height=''; 
-            elmnt.style.top=''; 
-            elmnt.style.left=''; 
-        }
-        currentSnap = null;
-    }
-}
-
-function dragDesktopIcon(elmnt) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    elmnt.onmousedown = dragMouseDown;
-
-    function dragMouseDown(e) {
-        e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY;
-        document.onmouseup = closeDragElement; document.onmousemove = elementDrag;
-    }
-    function elementDrag(e) {
-        e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY;
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px"; elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    }
-    function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
-}
-
-// --- Local File Explorer & Notepad ---
-let currentNotepadFile = null;
-
-function notepadSaveAs() {
-    let name = prompt("Enter file name (e.g. MyNotes):");
-    if(!name) return;
-    if(!name.endsWith('.txt')) name += '.txt';
-    currentNotepadFile = name;
-    notepadSave();
-}
-
-function notepadSave() {
-    if(!currentNotepadFile) { notepadSaveAs(); return; }
-    let content = document.getElementById('wordpad-editor').innerHTML;
-    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
-    files[currentNotepadFile] = content;
-    localStorage.setItem('echo_files', JSON.stringify(files));
-    notificationMgr.showNotification({ title: "File Saved", message: `${currentNotepadFile} was saved successfully!`, icon: "sparkles" });
-    renderFiles();
-}
-
-function notepadOpen() {
-    let name = prompt("Enter the exact file name to open:");
-    if(!name) return;
-    if(!name.endsWith('.txt')) name += '.txt';
-
-    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
-    if(files[name]) {
-        document.getElementById('wordpad-editor').innerHTML = files[name];
-        currentNotepadFile = name;
-    } else { alert("File not found!"); }
-}
-
-function renderFiles() {
-    const grid = document.getElementById('file-explorer-grid');
-    if(!grid) return;
-    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
-    grid.innerHTML = '';
-    for(let name in files) {
-        grid.innerHTML += `<div class="file-item" ondblclick="window.openFileFromExplorer('${name}')"><div class="f-icon">📄</div><span>${name}</span></div>`;
-    }
-}
-
-window.openFileFromExplorer = function(name) {
-    let files = JSON.parse(localStorage.getItem('echo_files') || '{}');
-    document.getElementById('wordpad-editor').innerHTML = files[name];
-    currentNotepadFile = name;
-    openApp('wordpad-window'); 
-};
-
-// --- Applications Logic ---
-let calcInput = "";
-function calcPress(val) { 
-    calcInput += val; 
-    const display = document.getElementById('calc-display');
-    if (display) display.value = calcInput; 
-}
-function calcClear() { 
-    calcInput = ""; 
-    const display = document.getElementById('calc-display');
-    if (display) display.value = "0"; 
-}
-function calcEval() { 
-    try { 
-        calcInput = eval(calcInput).toString(); 
-        const display = document.getElementById('calc-display');
-        if (display) display.value = calcInput; 
-    } catch(e) { 
-        const display = document.getElementById('calc-display');
-        if (display) display.value = "Error"; 
-        calcInput = ""; 
-    } 
-}
-
-function setWallpaper(url) {
-    let highResUrl = url.replace("w=400", "w=2000");
-    const desktop = document.getElementById('desktop');
-    if (desktop) desktop.style.backgroundImage = `url('${highResUrl}')`;
-    localStorage.setItem('echo_wallpaper', highResUrl);
-}
-
-// Wallpaper upload
-document.addEventListener('DOMContentLoaded', function() {
-    const wallpaperUpload = document.getElementById('wallpaper-upload');
-    if (wallpaperUpload) {
-        wallpaperUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    const desktop = document.getElementById('desktop');
-                    if (desktop) desktop.style.backgroundImage = `url('${ev.target.result}')`;
-                    try { 
-                        localStorage.setItem('echo_wallpaper', ev.target.result); 
-                    } catch(err) { 
-                        alert("Image applied for this session."); 
-                    }
-                }; 
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-});
-
-// --- Taskbar & Play Store Logic ---
-function switchStoreTab(tabId) {
-    document.querySelectorAll('.play-tab').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.store-tab-content').forEach(content => content.classList.remove('active'));
-    const tabBtn = document.querySelector(`[onclick="switchStoreTab('${tabId}')"]`);
-    if (tabBtn) tabBtn.classList.add('active');
-    const tabContent = document.getElementById(`store-${tabId}-tab`);
-    if (tabContent) tabContent.classList.add('active');
-}
-
-const taskbarIconsContainer = document.getElementById('app-icons');
-let draggedIcon = null;
-
-function makeIconDraggable(icon) {
-    icon.addEventListener('dragstart', function() { 
-        draggedIcon = this; 
-        setTimeout(() => this.classList.add('dragging-icon'), 0); 
-    });
-    icon.addEventListener('dragend', function() { 
-        setTimeout(() => { 
-            this.classList.remove('dragging-icon'); 
-            draggedIcon = null; 
-        }, 0); 
-    });
-    icon.addEventListener('dragover', (e) => e.preventDefault());
-    icon.addEventListener('drop', function(e) {
-        e.preventDefault();
-        if (draggedIcon !== this && taskbarIconsContainer) {
-            let allIcons = [...taskbarIconsContainer.children];
-            allIcons.indexOf(draggedIcon) < allIcons.indexOf(this) ? this.after(draggedIcon) : this.before(draggedIcon);
-        }
-    });
-}
-
-function installApp(appId, iconSymbol, appName, buttonElement) {
-    const launcherList = document.getElementById('launcher-list');
-    const existingItem = launcherList ? launcherList.querySelector(`[data-app-id="${appId}"]`) : null;
-    if (existingItem) {
-        notificationMgr.showNotification({ 
-            title: "Already Installed", 
-            message: `${appName} is already in your launcher.`, 
-            icon: "sparkles" 
-        });
-        return;
-    }
-
-    const pCont = document.getElementById('progress-container-' + appId);
-    const pBar = document.getElementById('progress-bar-' + appId);
-
-    buttonElement.innerText = 'Installing...'; 
-    buttonElement.disabled = true; 
-    if(pCont) pCont.style.display = 'block';
-
-    let progress = 0;
-    const dlInterval = setInterval(() => {
-        progress += Math.floor(Math.random() * 20) + 10; 
-        if (progress >= 100) {
-            progress = 100; 
-            clearInterval(dlInterval);
-            if(pBar) pBar.style.width = '100%';
-            buttonElement.innerText = 'Installed'; 
-            if(pCont) setTimeout(() => pCont.style.display = 'none', 500);
-
-            restoreAppToLauncher(appId, iconSymbol, appName); 
-            saveAppToStorage(appId, iconSymbol, appName);
-
-            notificationMgr.showNotification({ 
-                title: "Installation Complete", 
-                message: `${appName} has been added to your launcher. Right-click to add to shelf.`, 
-                icon: "sparkles" 
-            });
-        } else if(pBar) {
-            pBar.style.width = progress + '%';
-        }
-    }, 300); 
-}
-
-function restoreAppToLauncher(appId, iconSymbol, appName) {
-    const launcherList = document.getElementById('launcher-list');
-    if (!launcherList || launcherList.querySelector(`[data-app-id="${appId}"]`)) return;
-
-    const item = document.createElement('div');
-    item.className = 'launcher-item';
-    item.setAttribute('data-app-id', appId);
-    item.setAttribute('data-icon', iconSymbol);
-    item.setAttribute('data-name', appName);
-    item.onclick = () => openApp(appId);
-    item.innerHTML = `<div class="l-icon">${iconSymbol}</div><span class="l-text">${appName}</span>`;
-    launcherList.appendChild(item);
-}
-
-function restoreAppToTaskbar(appId, iconSymbol, appName) {
-    if (document.getElementById('taskbar-' + appId)) return;
-
-    const btn = document.createElement('button'); 
-    btn.className = 'app-icon'; 
-    btn.id = 'taskbar-' + appId; 
-    btn.title = appName; 
-    btn.innerHTML = iconSymbol; 
-    btn.draggable = true; 
-    btn.onclick = () => toggleApp(appId);
-
-    if (taskbarIconsContainer) taskbarIconsContainer.appendChild(btn); 
-    makeIconDraggable(btn);
-}
-
-function saveAppToStorage(appId, iconSymbol, appName) {
-    let savedApps = JSON.parse(localStorage.getItem('echo_installed_apps') || '[]');
-    if (!savedApps.find(app => app.id === appId)) {
-        savedApps.push({ 
-            id: appId, 
-            icon: iconSymbol, 
-            name: appName,
-            pinned: false
-        }); 
-        localStorage.setItem('echo_installed_apps', JSON.stringify(savedApps));
-    }
-}
