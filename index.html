@@ -11,27 +11,7 @@
 <base target="_blank">
 </head>
 <body data-theme="dark">
-    <div id="dev-banner" style="position: fixed; top: 0; left: 0; width: 100%; background: #ea4335; color: white; text-align: center; padding: 12px 20px; font-size: 14px; font-weight: 500; z-index: 999999; font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif; box-shadow: 0 2px 10px rgba(234,67,53,0.3);">
-    ⚠️ The website is currently going under huge development. We are fixing games and changing the name of our website soon.
-</div>
-<style>
-    #dev-banner { animation: bannerPulse 3s infinite ease-in-out; }
-    @keyframes bannerPulse {
-        0%, 100% { background: #ea4335; }
-        50% { background: #d33426; }
-    }
-    /* Push content down to account for banner */
-    #boot-screen { margin-top: 44px; }
-    #account-loading-screen { margin-top: 44px; }
-    #account-modal { margin-top: 44px; }
-    #welcome-modal { margin-top: 44px; }
-    #setup-screen { margin-top: 44px; }
-    #lock-screen { margin-top: 44px; }
-    #desktop { margin-top: 44px; height: calc(100vh - 44px); }
-    #aboutblank-modal { margin-top: 44px; }
-    #update-modal { margin-top: 44px; }
-    #calendar-modal { margin-top: 44px; }
-</style>
+
     <div id="boot-screen">
         <div class="boot-logo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 64px; height: 64px; color: #8ab4f8;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>
@@ -67,24 +47,21 @@
         </div>
     </div>
 
-    <!-- Update V1.8 Modal -->
+    <!-- Update V2.1 Modal -->
     <div id="update-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100000; justify-content: center; align-items: center;">
         <div class="update-box" style="background: var(--sys-surface); border-radius: var(--radius-lg); padding: 30px; width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--sys-border);">
-            <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Echo OS Development Update <span style="font-size:14px;color:var(--sys-text-muted)">MAY 6</span></h2>
+            <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Echo OS Update <span style="font-size:14px;color:var(--sys-text-muted)">V2.1</span></h2>
             <div style="background: rgba(128,128,128,0.1); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;">
                 <h3 style="margin: 0 0 15px 0; color: var(--sys-text); font-size: 16px;">What's New:</h3>
                 <ul style="margin: 0; padding-left: 20px; color: var(--sys-text); font-size: 14px; line-height: 1.6;">
-                    <li><strong>👤 Echo Account System</strong> - Create and manage Echo OS accounts with @echoos.com</li>
-                    <li><strong>🏠 Fixed Granny 3</strong> - Granny 3 now loads correctly</li>
-                    <li><strong>👵 Added Granny 2</strong> - New horror game available</li>
-                    <li><strong>⚡ Added Pokemon</strong> - Pokemon game now available</li>
-                    <li><strong>🏎️ Fixed Smash Karts</strong> - Smash Karts now loads correctly</li>
-                    <li><strong>🎵 Echo Music Media Controller</strong> - Control music from taskbar</li>
-                    <li><strong>🎤 Fixed Friday Night Funkin</strong> - FNF now loads correctly</li>
-                    <li><strong>🔫 Added 1v1.LOL</strong> - New battle royale shooter available</li>
-                    <li><strong>🔗 Auto Link Creator Removed</strong> - Now a button you can click instead</li>
-                    <li><strong>📌 Continue Where You Left Off</strong> - Active apps shown in launcher</li>
-                    <li><strong>🔋 Battery Saver</strong> - Saves data usage to a file automatically</li>
+                    <li><strong>🎤 Fixed FNF</strong> - Friday Night Funkin now loads correctly</li>
+                    <li><strong>⛏️ Fixed Eaglercraft Lag</strong> - Performance improvements</li>
+                    <li><strong>🚗 Fixed Escape Road</strong> - Escape Road now works properly</li>
+                    <li><strong>🏎️ Fixed Escape Road 2</strong> - Escape Road 2 now works properly</li>
+                    <li><strong>📱 Fixed Bitlife</strong> - Bitlife loading issues resolved</li>
+                    <li><strong>💬 Added Chat</strong> - New Echo Chat app with DM notifications</li>
+                    <li><strong>✨ Added New Entering Screen</strong> - "Created By Darden" creator screen</li>
+                    <li><strong>🚔 Fixed GTA Vice City</strong> - GTA Vice City now loads correctly</li>
                 </ul>
             </div>
             <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
@@ -201,8 +178,8 @@
                 <div class="lock-user-avatar">
                     <img src="https://www.gravatar.com/avatar/?d=mp&s=128" alt="User" id="lock-avatar-img">
                 </div>
-                <h2 id="echo-lock-username" class="echo-lock-username">User</h2>
-                <div id="echo-lock-email" class="echo-lock-email"></div>
+                <h2 id="lock-username" >User</h2>
+                <div id="lock-email" ></div>
                 <button class="lock-option-btn" onclick="goIntoAboutBlank()" style="margin-bottom: 20px; background: rgba(255,255,255,0.2); font-size: 12px;">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -248,6 +225,20 @@
                     </svg>
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Creator Screen -->
+    <div id="creator-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99996; justify-content: center; align-items: center; opacity: 0; transition: opacity 1s ease-in;">
+        <div id="creator-text" style="color: white; font-size: 48px; font-weight: 300; font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif; opacity: 0; transition: opacity 2s ease-in-out; text-align: center; letter-spacing: 4px; text-transform: uppercase;">
+            Created By Darden
+        </div>
+    </div>
+
+    <!-- Creator Screen -->
+    <div id="creator-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99996; justify-content: center; align-items: center; opacity: 0; transition: opacity 1s ease-in;">
+        <div id="creator-text" style="color: white; font-size: 48px; font-weight: 300; font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif; opacity: 0; transition: opacity 2s ease-in-out; text-align: center; letter-spacing: 4px; text-transform: uppercase;">
+            Created By Darden
         </div>
     </div>
 
@@ -440,18 +431,16 @@
 
                 <h3 class="settings-title">System Updates</h3>
                 <div class="settings-card">
-                    <strong style="display: block; margin-bottom: 5px;">Echo OS v1.0 Development Build</strong>
+                    <strong style="display: block; margin-bottom: 5px;">Echo OS v2.1</strong>
                     <ul style="font-size: 13px; color: var(--sys-text-muted); margin-top: 0; margin-bottom: 15px; padding-left: 20px;">
-                        <li>🛍️ Upgraded The Play Store - detail modals, browse all items</li>
-                        <li>🔧 Fixed the Servers - connectivity issues resolved</li>
-                        <li>📱 Added Bitlife - text-based life simulator</li>
-                        <li>🏈 Added Football Bros - football sports game</li>
-                        <li>⭐ Favorites Tab - save favorite games and apps</li>
-                        <li>📱 Apps Category - browse apps in Store</li>
-                        <li>👤 Echo Account System - Create and manage Echo OS accounts</li>
-                        <li>🎵 Echo Music Media Controller - control from taskbar</li>
-                        <li>Continue where you left off - active apps in launcher</li>
-                        <li>Battery Saver - saves data usage to file automatically</li>
+                        <li>🎤 Fixed FNF - Friday Night Funkin now loads correctly</li>
+                        <li>⛏️ Fixed Eaglercraft Lag - Performance improvements</li>
+                        <li>🚗 Fixed Escape Road - Now works properly</li>
+                        <li>🏎️ Fixed Escape Road 2 - Now works properly</li>
+                        <li>📱 Fixed Bitlife - Loading issues resolved</li>
+                        <li>💬 Added Chat - New Echo Chat app with DM notifications</li>
+                        <li>✨ Added New Entering Screen - "Created By Darden" creator screen</li>
+                        <li>🚔 Fixed GTA Vice City - Now loads correctly</li>
                     </ul>
                     <button onclick="alert('Your system is up to date!')" class="modern-btn">Check for Updates</button>
                 </div>
@@ -655,6 +644,34 @@
             </div>
         </div>
 
+        <div class="window" id="echochat-window" style="display: none; width: 900px; height: 700px;">
+            <div class="window-header" id="echochat-window-header">
+                <span class="window-title">💬 Echo Chat</span>
+                <div>
+                    <button class="win-btn" onclick="minimizeApp('echochat-window')">−</button>
+                    <button class="win-btn" onclick="maximizeApp('echochat-window')">□</button>
+                    <button class="win-btn close-btn" onclick="closeApp('echochat-window')">✕</button>
+                </div>
+            </div>
+            <div class="window-content" style="padding: 0; overflow: hidden;">
+                <iframe data-src="Apps/EchoChat.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe>
+            </div>
+        </div>
+
+        <div class="window" id="echochat-window" style="display: none; width: 900px; height: 700px;">
+            <div class="window-header" id="echochat-window-header">
+                <span class="window-title">💬 Echo Chat</span>
+                <div>
+                    <button class="win-btn" onclick="minimizeApp('echochat-window')">−</button>
+                    <button class="win-btn" onclick="maximizeApp('echochat-window')">□</button>
+                    <button class="win-btn close-btn" onclick="closeApp('echochat-window')">✕</button>
+                </div>
+            </div>
+            <div class="window-content" style="padding: 0; overflow: hidden;">
+                <iframe data-src="Apps/EchoChat.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe>
+            </div>
+        </div>
+
     <div id="notification-toast-container"></div>
 
     <div id="launcher-menu" style="display: none;">
@@ -680,8 +697,7 @@
             <div class="launcher-item" data-app-id="1v1lol-window" data-icon="🔫" data-name="1v1.LOL" onclick="openApp('1v1lol-window')"><div class="l-icon">🔫</div><span class="l-text">1v1.LOL</span></div>
             <div class="launcher-item" data-app-id="bitlife-window" data-icon="📱" data-name="Bitlife" onclick="openApp('bitlife-window')"><div class="l-icon">📱</div><span class="l-text">Bitlife</span></div>
             <div class="launcher-item" data-app-id="footballbros-window" data-icon="🏈" data-name="Football Bros" onclick="openApp('footballbros-window')"><div class="l-icon">🏈</div><span class="l-text">Football Bros</span></div>
-
-
+            <div class="launcher-item" data-app-id="echochat-window" data-icon="💬" data-name="Echo Chat" onclick="openApp('echochat-window')"><div class="l-icon">💬</div><span class="l-text">Echo Chat</span></div>
         </div>
     </div>
 
@@ -749,6 +765,7 @@
                 <button class="app-icon" id="taskbar-wordpad-window" draggable="true" onclick="toggleApp('wordpad-window')" title="Wordpad">📝</button>
                 <button class="app-icon" id="taskbar-calc-window" draggable="true" onclick="toggleApp('calc-window')" title="Calculator">🧮</button>
                 <button class="app-icon" id="taskbar-files-window" draggable="true" onclick="toggleApp('files-window')" title="Files">📁</button>
+                <button class="app-icon" id="taskbar-echochat-window" draggable="true" onclick="toggleApp('echochat-window')" title="Echo Chat">💬</button>
             </div>
             <button id="media-control-btn" onclick="toggleMediaModal()" title="Media Controls">
                 <div class="media-wave"></div>
