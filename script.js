@@ -1044,6 +1044,16 @@ window.initializeDesktop = function() {
         }
     });
 
+    // Ensure pre-installed apps are in taskbar
+    PRE_INSTALLED_APPS.forEach(appId => {
+        const game = PS_GAMES[appId];
+        const app = PS_APPS[appId];
+        const item = game || app;
+        if (item && !document.getElementById('taskbar-' + appId)) {
+            restoreAppToTaskbar(appId, item.icon, item.name);
+        }
+    });
+
     document.querySelectorAll('.app-icon').forEach(makeIconDraggable);
     document.querySelectorAll('.desktop-icon').forEach(dragDesktopIcon);
     initLauncherContextMenu();
@@ -3562,6 +3572,16 @@ function initializeDesktop() {
         restoreAppToLauncher(app.id, app.icon, app.name);
         if (app.pinned) {
             restoreAppToTaskbar(app.id, app.icon, app.name);
+        }
+    });
+
+    // Ensure pre-installed apps are in taskbar (in case localStorage was cleared)
+    PRE_INSTALLED_APPS.forEach(appId => {
+        const game = PS_GAMES[appId];
+        const app = PS_APPS[appId];
+        const item = game || app;
+        if (item && !document.getElementById('taskbar-' + appId)) {
+            restoreAppToTaskbar(appId, item.icon, item.name);
         }
     });
 
